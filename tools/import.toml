@@ -1,0 +1,364 @@
+# Maps raw reference data (O*NET, ESCO/tabiya, CareerOneStop, NUCC, keywords.json, playbooks) into
+# vocab/imported/*.json. Run: uv run python tools/import_vocab.py --raw ../data
+# Paths are relative to --raw.
+# Entity types: title, skill, tech, tool, cert, org, license, specialty, degree, language.
+#
+# [[source]] keys
+#   format      tsv | csv | json | sql | xlsx
+#   path        file path; json accepts a glob
+#   entity      entity type every row becomes
+#   label       field holding the display name (also matched as an alias)
+#   id          field holding a stable id (default: the normalized label)
+#   aliases     extra fields matched as aliases; alias_sep splits multi-value fields
+#   cased       fields whose aliases must match with exact case (acronyms)
+#   cased_flag  field holding true/false: this row's aliases match with exact case
+#   soc         field holding O*NET-SOC code(s); soc_via maps it through [[lookup]] tables
+#   attrs       {output_name = field} copied onto the entity
+#   filters     [{field, not_in}] rows to skip
+#   records     json only: dotted path to the record list, e.g. "specialties[*]"
+#   skip_if     json only: skip a file that has any of these top-level keys
+#   action      "remove": delete these aliases from `entity` instead of adding them
+
+places = "us_zip_places.json"
+
+# ---- lookups: key -> value tables used by soc_via ----
+
+[[lookup]]
+name = "esco_code"
+format = "csv"
+path = "tabiya/occupations.csv"
+key = "ID"
+value = "CODE"
+
+[[lookup]]
+name = "esco_soc"
+format = "xlsx"
+path = "crosswalks/ESCO_to_ONET-SOC.xlsx"
+header_row = 4
+key = "ESCO/ISCO Code"
+value = "O*NET-SOC 2019 Code"
+
+# ---- sources: every row becomes an entity with aliases ----
+# Order matters: the first label seen for an entity id is the one shown.
+
+[[source]]
+name = "onet_occupations"
+format = "tsv"
+path = "onet/Occupation Data.txt"
+entity = "title"
+id = "O*NET-SOC Code"
+label = "Title"
+soc = "O*NET-SOC Code"
+
+[[source]]
+name = "onet_alt_titles"
+format = "tsv"
+path = "onet/Alternate Titles.txt"
+entity = "title"
+id = "O*NET-SOC Code"
+label = "Alternate Title"
+aliases = ["Short Title"]
+soc = "O*NET-SOC Code"
+
+[[source]]
+name = "onet_reported_titles"
+format = "tsv"
+path = "onet/Sample of Reported Titles.txt"
+entity = "title"
+id = "O*NET-SOC Code"
+label = "Reported Job Title"
+soc = "O*NET-SOC Code"
+
+[[source]]
+name = "playbook_titles"
+format = "json"
+path = "playbooks/*.json"
+skip_if = ["alias_of"]
+entity = "title"
+id = "occupation.soc_code"
+label = "occupation.canonical_title"
+aliases = ["title_disambiguation.aliases[*]"]
+soc = "occupation.soc_code"
+
+[[source]]
+name = "esco_occupations"
+format = "csv"
+path = "tabiya/occupations.csv"
+entity = "title"
+id = "ID"
+label = "PREFERREDLABEL"
+aliases = ["ALTLABELS"]
+alias_sep = "\n"
+soc = "CODE"
+soc_via = ["esco_soc"]
+
+[[source]]
+name = "cos_certifications"
+format = "sql"
+path = "certifications/2-CERTIFICATIONS.sql"
+table = "CERTIFICATIONS"
+entity = "cert"
+id = "CERT_ID"
+label = "CERT_NAME"
+cased = ["ACRONYM"]
+attrs = { org_id = "ORG_ID" }
+filters = [{ field = "DELETED", not_in = ["1"] }, { field = "SUPPRESS", not_in = ["1"] }]
+
+[[source]]
+name = "cos_orgs"
+format = "sql"
+path = "certifications/1-CERT_ORGS.sql"
+table = "CERT_ORGS"
+entity = "org"
+id = "ORG_ID"
+label = "ORG_NAME"
+cased = ["ACRONYM"]
+filters = [{ field = "DELETED", not_in = ["1"] }, { field = "SUPPRESS", not_in = ["1"] }]
+
+[[source]]
+name = "nucc_taxonomy"
+format = "json"
+path = "nucc/nucc_taxonomy_251.json"
+records = "specialties[*]"
+entity = "specialty"
+id = "taxonomyCode"
+label = "displayName"
+soc = "onetSocCode"
+
+[[source]]
+name = "nucc_aliases"
+format = "json"
+path = "nucc/specialty_aliases.json"
+records = "aliases[*]"
+entity = "specialty"
+id = "taxonomyCode"
+label = "surface"
+cased_flag = "cased"
+
+[[source]]
+name = "nucc_gaps"
+format = "json"
+path = "nucc/specialty_alias_overlay.json"
+records = "gaps[*]"
+entity = "specialty"
+label = "surfaces[*]"
+action = "remove"
+
+[[source]]
+name = "onet_technology"
+format = "tsv"
+path = "onet/Technology Skills.txt"
+entity = "tech"
+label = "Example"
+soc = "O*NET-SOC Code"
+
+[[source]]
+name = "playbook_technology"
+format = "json"
+path = "playbooks/*.json"
+skip_if = ["alias_of"]
+entity = "tech"
+label = "technology_signals[*].name"
+soc = "occupation.soc_code"
+
+[[source]]
+name = "onet_tools"
+format = "tsv"
+path = "onet/Tools Used.txt"
+entity = "tool"
+label = "Example"
+soc = "O*NET-SOC Code"
+
+# ---- keywords.json: a vocabulary per O*NET occupation (titles, licenses, certifications, skills), read at
+# three levels: the occupation, its sub-occupations, and its NUCC specializations. ----
+
+[[source]]
+name = "kw_titles"
+format = "json"
+path = "keywords.json"
+records = "Occupation.{soc}.Title.{label}"
+entity = "title"
+id = "soc"
+label = "label"
+aliases = ["_value[*]"]
+soc = "soc"
+
+[[source]]
+name = "kw_sub_titles"
+format = "json"
+path = "keywords.json"
+records = "Occupation.{parent}.Occupation.{soc}.Title.{label}"
+entity = "title"
+id = "soc"
+label = "label"
+aliases = ["_value[*]"]
+soc = "soc"
+
+[[source]]
+name = "kw_licenses"
+format = "json"
+path = "keywords.json"
+records = "Occupation.{soc}.License.{label}"
+entity = "license"
+label = "label"
+aliases = ["_value[*]"]
+soc = "soc"
+
+[[source]]
+name = "kw_sub_licenses"
+format = "json"
+path = "keywords.json"
+records = "Occupation.{parent}.Occupation.{soc}.License.{label}"
+entity = "license"
+label = "label"
+aliases = ["_value[*]"]
+soc = "soc"
+
+[[source]]
+name = "kw_spec_licenses"
+format = "json"
+path = "keywords.json"
+records = "Occupation.{soc}.Specialization.{code}.License.{label}"
+entity = "license"
+label = "label"
+aliases = ["_value[*]"]
+soc = "soc"
+
+[[source]]
+name = "kw_certifications"
+format = "json"
+path = "keywords.json"
+records = "Occupation.{soc}.Certification.{label}"
+entity = "cert"
+label = "label"
+aliases = ["_value[*]"]
+soc = "soc"
+
+[[source]]
+name = "kw_sub_certifications"
+format = "json"
+path = "keywords.json"
+records = "Occupation.{parent}.Occupation.{soc}.Certification.{label}"
+entity = "cert"
+label = "label"
+aliases = ["_value[*]"]
+soc = "soc"
+
+[[source]]
+name = "kw_spec_certifications"
+format = "json"
+path = "keywords.json"
+records = "Occupation.{soc}.Specialization.{code}.Certification.{label}"
+entity = "cert"
+label = "label"
+aliases = ["_value[*]"]
+soc = "soc"
+
+[[source]]
+name = "kw_skills"
+format = "json"
+path = "keywords.json"
+records = "Occupation.{soc}.Skill.{label}"
+entity = "skill"
+label = "label"
+aliases = ["_value[*]"]
+soc = "soc"
+
+[[source]]
+name = "kw_sub_skills"
+format = "json"
+path = "keywords.json"
+records = "Occupation.{parent}.Occupation.{soc}.Skill.{label}"
+entity = "skill"
+label = "label"
+aliases = ["_value[*]"]
+soc = "soc"
+
+[[source]]
+name = "kw_spec_skills"
+format = "json"
+path = "keywords.json"
+records = "Occupation.{soc}.Specialization.{code}.Skill.{label}"
+entity = "skill"
+label = "label"
+aliases = ["_value[*]"]
+soc = "soc"
+
+[[source]]
+name = "kw_languages"
+format = "json"
+path = "keywords.json"
+records = "Language.{label}"
+entity = "language"
+label = "label"
+aliases = ["_value[*]"]
+
+[[source]]
+name = "kw_seniority"
+format = "json"
+path = "keywords.json"
+records = "Seniority.{label}"
+entity = "seniority"
+label = "label"
+aliases = ["_value[*]"]
+
+[[source]]
+name = "kw_work_mode"
+format = "json"
+path = "keywords.json"
+records = "WorkMode.{label}"
+entity = "work_mode"
+label = "label"
+aliases = ["_value[*]"]
+
+[[source]]
+name = "kw_shift"
+format = "json"
+path = "keywords.json"
+records = "Shift.{label}"
+entity = "shift"
+label = "label"
+aliases = ["_value[*]"]
+
+[[source]]
+name = "kw_employment_type"
+format = "json"
+path = "keywords.json"
+records = "EmploymentType.{label}"
+entity = "employment_type"
+label = "label"
+aliases = ["_value[*]"]
+
+[[source]]
+name = "esco_skills"
+format = "csv"
+path = "tabiya/skills.csv"
+entity = "skill"
+id = "ID"
+label = "PREFERREDLABEL"
+aliases = ["ALTLABELS"]
+alias_sep = "\n"
+
+# ---- relations: extra entity <-> occupation links (used to boost coherent matches) ----
+
+[[relation]]
+name = "esco_occupation_skills"
+format = "csv"
+path = "tabiya/occupation_skill_relations.csv"
+entity = "skill"
+id = "SKILLID"
+soc = "OCCUPATIONID"
+soc_via = ["esco_code", "esco_soc"]
+weight = "RELATIONTYPE"
+weights = { essential = 1.0, optional = 0.6 }
+
+[[relation]]
+name = "cos_cert_occupations"
+format = "sql"
+path = "certifications/6-CERT_ONET_ASSIGN.sql"
+table = "CERT_ONET_ASSIGN"
+entity = "cert"
+id = "CERT_ID"
+soc = "ONETCODE"
+weight = "RELATION"
+weights = { D = 1.0, I = 0.5 }
