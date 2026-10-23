@@ -1,0 +1,9 @@
+.venv/
+__pycache__/
+index.pkl
+# real resumes and their answer keys are personal data
+eval/
+resume.txt
+*.resume.txt
+.ruff_cache/
+.DS_Store
