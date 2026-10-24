@@ -1,0 +1,25 @@
+{
+  "removals": {
+    "specialty": [
+      "telemetry",
+      "tele",
+      "progressive care",
+      "pcu",
+      "stepdown",
+      "step down",
+      "observation",
+      "float pool",
+      "float",
+      "resource team",
+      "prn pool",
+      "charge nurse",
+      "clinical coordinator",
+      "nurse manager",
+      "supervisor",
+      "director",
+      "cardiac",
+      "cardiology",
+      "cath lab"
+    ]
+  }
+}
