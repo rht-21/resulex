@@ -1,0 +1,357 @@
+{
+  "type": "cert",
+  "entities": [
+    {
+      "id": "family nurse practitioner board certified",
+      "label": "Family Nurse Practitioner - Board Certified",
+      "source": "curated_certifications",
+      "aliases": [
+        "Family Nurse Practitioner - Board Certified",
+        "ANCC FNP",
+        "ANCC family nurse practitioner"
+      ],
+      "cased": [
+        "FNP-BC"
+      ],
+      "socs": {
+        "29-1171.00": 1.0
+      }
+    },
+    {
+      "id": "family nurse practitioner certified",
+      "label": "Family Nurse Practitioner - Certified",
+      "source": "curated_certifications",
+      "aliases": [
+        "Family Nurse Practitioner - Certified",
+        "AANP FNP",
+        "AANP family nurse practitioner"
+      ],
+      "cased": [
+        "FNP-C"
+      ],
+      "socs": {
+        "29-1171.00": 1.0
+      }
+    },
+    {
+      "id": "adult gerontology nurse practitioner certified",
+      "label": "Adult-Gerontology Nurse Practitioner - Certified",
+      "source": "curated_certifications",
+      "aliases": [
+        "Adult-Gerontology Nurse Practitioner - Certified",
+        "AANP AGNP"
+      ],
+      "cased": [
+        "AGNP-C"
+      ],
+      "socs": {
+        "29-1171.00": 1.0
+      }
+    },
+    {
+      "id": "adult gerontology primary care nurse practitioner board certified",
+      "label": "Adult-Gerontology Primary Care Nurse Practitioner - Board Certified",
+      "source": "curated_certifications",
+      "aliases": [
+        "Adult-Gerontology Primary Care Nurse Practitioner - Board Certified"
+      ],
+      "cased": [
+        "AGPCNP-BC",
+        "AGNP-BC"
+      ],
+      "socs": {
+        "29-1171.00": 1.0
+      }
+    },
+    {
+      "id": "adult gerontology acute care nurse practitioner board certified",
+      "label": "Adult-Gerontology Acute Care Nurse Practitioner - Board Certified",
+      "source": "curated_certifications",
+      "aliases": [
+        "Adult-Gerontology Acute Care Nurse Practitioner - Board Certified",
+        "acute care nurse practitioner certification"
+      ],
+      "cased": [
+        "AGACNP-BC",
+        "ACNP-BC",
+        "ACNPC-AG"
+      ],
+      "socs": {
+        "29-1171.00": 1.0
+      }
+    },
+    {
+      "id": "adult nurse practitioner board certified",
+      "label": "Adult Nurse Practitioner - Board Certified",
+      "source": "curated_certifications",
+      "aliases": [
+        "Adult Nurse Practitioner - Board Certified"
+      ],
+      "cased": [
+        "ANP-BC"
+      ],
+      "socs": {
+        "29-1171.00": 1.0
+      }
+    },
+    {
+      "id": "psychiatric mental health nurse practitioner board certified",
+      "label": "Psychiatric-Mental Health Nurse Practitioner - Board Certified",
+      "source": "curated_certifications",
+      "aliases": [
+        "Psychiatric-Mental Health Nurse Practitioner - Board Certified"
+      ],
+      "cased": [
+        "PMHNP-BC"
+      ],
+      "socs": {
+        "29-1171.00": 1.0
+      }
+    },
+    {
+      "id": "pediatric nurse practitioner primary care",
+      "label": "Pediatric Nurse Practitioner - Primary Care",
+      "source": "curated_certifications",
+      "aliases": [
+        "Pediatric Nurse Practitioner - Primary Care"
+      ],
+      "cased": [
+        "CPNP-PC",
+        "PNP-BC"
+      ],
+      "socs": {
+        "29-1171.00": 1.0
+      }
+    },
+    {
+      "id": "women s health nurse practitioner board certified",
+      "label": "Women's Health Nurse Practitioner - Board Certified",
+      "source": "curated_certifications",
+      "aliases": [
+        "Women's Health Nurse Practitioner - Board Certified"
+      ],
+      "cased": [
+        "WHNP-BC"
+      ],
+      "socs": {
+        "29-1171.00": 1.0
+      }
+    },
+    {
+      "id": "trauma nursing core course",
+      "label": "Trauma Nursing Core Course",
+      "source": "curated_certifications",
+      "aliases": [
+        "Trauma Nursing Core Course"
+      ],
+      "cased": [
+        "TNCC"
+      ],
+      "socs": {
+        "29-1141.00": 1.0
+      }
+    },
+    {
+      "id": "emergency nursing pediatric course",
+      "label": "Emergency Nursing Pediatric Course",
+      "source": "curated_certifications",
+      "aliases": [
+        "Emergency Nursing Pediatric Course"
+      ],
+      "cased": [
+        "ENPC"
+      ],
+      "socs": {
+        "29-1141.00": 1.0
+      }
+    },
+    {
+      "id": "neonatal resuscitation program",
+      "label": "Neonatal Resuscitation Program",
+      "source": "curated_certifications",
+      "aliases": [
+        "Neonatal Resuscitation Program"
+      ],
+      "cased": [
+        "NRP"
+      ],
+      "socs": {
+        "29-1141.00": 1.0
+      }
+    },
+    {
+      "id": "nih stroke scale",
+      "label": "NIH Stroke Scale",
+      "source": "curated_certifications",
+      "aliases": [
+        "NIH Stroke Scale",
+        "NIH stroke scale certification",
+        "NIHSS certification"
+      ],
+      "cased": [
+        "NIHSS"
+      ],
+      "socs": {
+        "29-1141.00": 1.0
+      }
+    },
+    {
+      "id": "inpatient obstetric nursing",
+      "label": "Inpatient Obstetric Nursing",
+      "source": "curated_certifications",
+      "aliases": [
+        "Inpatient Obstetric Nursing"
+      ],
+      "cased": [
+        "RNC-OB"
+      ],
+      "socs": {
+        "29-1141.00": 1.0
+      }
+    },
+    {
+      "id": "electronic fetal monitoring",
+      "label": "Electronic Fetal Monitoring",
+      "source": "curated_certifications",
+      "aliases": [
+        "Electronic Fetal Monitoring"
+      ],
+      "cased": [
+        "RNC-EFM",
+        "C-EFM"
+      ],
+      "socs": {
+        "29-1141.00": 1.0
+      }
+    },
+    {
+      "id": "registered nurse first assistant",
+      "label": "Registered Nurse First Assistant",
+      "source": "curated_certifications",
+      "aliases": [
+        "Registered Nurse First Assistant",
+        "certified registered nurse first assistant"
+      ],
+      "cased": [
+        "RNFA",
+        "CRNFA"
+      ],
+      "socs": {
+        "29-1141.00": 1.0
+      }
+    },
+    {
+      "id": "certified pediatric nurse",
+      "label": "Certified Pediatric Nurse",
+      "source": "curated_certifications",
+      "aliases": [
+        "Certified Pediatric Nurse"
+      ],
+      "cased": [
+        "CPN"
+      ],
+      "socs": {
+        "29-1141.00": 1.0
+      }
+    },
+    {
+      "id": "cardiopulmonary resuscitation",
+      "label": "Cardiopulmonary Resuscitation",
+      "source": "curated_certifications",
+      "aliases": [
+        "Cardiopulmonary Resuscitation",
+        "CPR certification",
+        "CPR/AED",
+        "CPR and AED"
+      ],
+      "cased": [
+        "CPR"
+      ]
+    },
+    {
+      "id": "crisis prevention intervention",
+      "label": "Crisis Prevention Intervention",
+      "source": "curated_certifications",
+      "aliases": [
+        "Crisis Prevention Intervention",
+        "nonviolent crisis intervention",
+        "CPI certification"
+      ],
+      "cased": [
+        "CPI"
+      ]
+    },
+    {
+      "id": "advanced medical life support",
+      "label": "Advanced Medical Life Support",
+      "source": "curated_certifications",
+      "aliases": [
+        "Advanced Medical Life Support"
+      ],
+      "cased": [
+        "AMLS"
+      ]
+    },
+    {
+      "id": "pediatric emergency assessment recognition and stabilization",
+      "label": "Pediatric Emergency Assessment Recognition and Stabilization",
+      "source": "curated_certifications",
+      "aliases": [
+        "Pediatric Emergency Assessment Recognition and Stabilization"
+      ],
+      "cased": [
+        "PEARS"
+      ]
+    },
+    {
+      "id": "advanced trauma life support",
+      "label": "Advanced Trauma Life Support",
+      "source": "curated_certifications",
+      "aliases": [
+        "Advanced Trauma Life Support"
+      ],
+      "cased": [
+        "ATLS"
+      ]
+    },
+    {
+      "id": "prehospital trauma life support",
+      "label": "Prehospital Trauma Life Support",
+      "source": "curated_certifications",
+      "aliases": [
+        "Prehospital Trauma Life Support"
+      ],
+      "cased": [
+        "PHTLS"
+      ]
+    },
+    {
+      "id": "board certified behavior analyst",
+      "label": "Board Certified Behavior Analyst",
+      "source": "curated_certifications",
+      "aliases": [
+        "Board Certified Behavior Analyst"
+      ],
+      "cased": [
+        "BCBA"
+      ],
+      "socs": {
+        "19-3033.00": 1.0
+      }
+    },
+    {
+      "id": "registered behavior technician",
+      "label": "Registered Behavior Technician",
+      "source": "curated_certifications",
+      "aliases": [
+        "Registered Behavior Technician"
+      ],
+      "cased": [
+        "RBT"
+      ],
+      "socs": {
+        "29-2053.00": 1.0
+      }
+    }
+  ]
+}

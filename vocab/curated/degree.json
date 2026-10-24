@@ -1,0 +1,548 @@
+{
+  "type": "degree",
+  "entities": [
+    {
+      "id": "high school diploma",
+      "label": "High School Diploma",
+      "source": "curated_degrees",
+      "aliases": [
+        "High School Diploma",
+        "high school",
+        "GED",
+        "general educational development",
+        "high school equivalency"
+      ],
+      "attrs": {
+        "level": "2",
+        "field": null
+      }
+    },
+    {
+      "id": "diploma",
+      "label": "Diploma",
+      "source": "curated_degrees",
+      "aliases": [
+        "Diploma"
+      ],
+      "attrs": {
+        "level": "3",
+        "field": null
+      }
+    },
+    {
+      "id": "certificate",
+      "label": "Certificate",
+      "source": "curated_degrees",
+      "aliases": [
+        "Certificate",
+        "certification program",
+        "post-secondary certificate"
+      ],
+      "attrs": {
+        "level": "3",
+        "field": null
+      }
+    },
+    {
+      "id": "associate degree",
+      "label": "Associate Degree",
+      "source": "curated_degrees",
+      "aliases": [
+        "Associate Degree",
+        "associate",
+        "associates",
+        "associate's degree",
+        "associate of arts",
+        "associate of science",
+        "associate of applied science",
+        "AA",
+        "AS",
+        "AAS",
+        "A.A.",
+        "A.S.",
+        "A.A.S."
+      ],
+      "attrs": {
+        "level": "5",
+        "field": null
+      }
+    },
+    {
+      "id": "associate degree in nursing",
+      "label": "Associate Degree in Nursing",
+      "source": "curated_degrees",
+      "aliases": [
+        "Associate Degree in Nursing",
+        "ADN",
+        "associate of science in nursing",
+        "ASN"
+      ],
+      "attrs": {
+        "level": "5",
+        "field": "Nursing"
+      }
+    },
+    {
+      "id": "bachelor s degree",
+      "label": "Bachelor's Degree",
+      "source": "curated_degrees",
+      "aliases": [
+        "Bachelor's Degree",
+        "bachelor",
+        "bachelors",
+        "bachelor's",
+        "undergraduate degree"
+      ],
+      "attrs": {
+        "level": "6",
+        "field": null
+      }
+    },
+    {
+      "id": "bachelor of art",
+      "label": "Bachelor of Arts",
+      "source": "curated_degrees",
+      "aliases": [
+        "Bachelor of Arts",
+        "BA",
+        "B.A.",
+        "AB",
+        "A.B."
+      ],
+      "attrs": {
+        "level": "6",
+        "field": null
+      }
+    },
+    {
+      "id": "bachelor of science",
+      "label": "Bachelor of Science",
+      "source": "curated_degrees",
+      "aliases": [
+        "Bachelor of Science",
+        "BS",
+        "B.S.",
+        "BSc",
+        "B.Sc.",
+        "B.Sc"
+      ],
+      "attrs": {
+        "level": "6",
+        "field": null
+      }
+    },
+    {
+      "id": "bachelor of science in nursing",
+      "label": "Bachelor of Science in Nursing",
+      "source": "curated_degrees",
+      "aliases": [
+        "Bachelor of Science in Nursing",
+        "BSN",
+        "B.S.N."
+      ],
+      "attrs": {
+        "level": "6",
+        "field": "Nursing"
+      }
+    },
+    {
+      "id": "bachelor of engineering",
+      "label": "Bachelor of Engineering",
+      "source": "curated_degrees",
+      "aliases": [
+        "Bachelor of Engineering",
+        "BE",
+        "B.E.",
+        "BEng",
+        "B.Eng."
+      ],
+      "attrs": {
+        "level": "6",
+        "field": "Engineering"
+      }
+    },
+    {
+      "id": "bachelor of technology",
+      "label": "Bachelor of Technology",
+      "source": "curated_degrees",
+      "aliases": [
+        "Bachelor of Technology",
+        "BTech",
+        "B.Tech",
+        "B.Tech."
+      ],
+      "attrs": {
+        "level": "6",
+        "field": "Technology"
+      }
+    },
+    {
+      "id": "bachelor of business administration",
+      "label": "Bachelor of Business Administration",
+      "source": "curated_degrees",
+      "aliases": [
+        "Bachelor of Business Administration",
+        "BBA",
+        "B.B.A."
+      ],
+      "attrs": {
+        "level": "6",
+        "field": "Business Administration"
+      }
+    },
+    {
+      "id": "bachelor of fine art",
+      "label": "Bachelor of Fine Arts",
+      "source": "curated_degrees",
+      "aliases": [
+        "Bachelor of Fine Arts",
+        "BFA",
+        "B.F.A."
+      ],
+      "attrs": {
+        "level": "6",
+        "field": "Fine Arts"
+      }
+    },
+    {
+      "id": "bachelor of commerce",
+      "label": "Bachelor of Commerce",
+      "source": "curated_degrees",
+      "aliases": [
+        "Bachelor of Commerce",
+        "BCom",
+        "B.Com",
+        "B.Com."
+      ],
+      "attrs": {
+        "level": "6",
+        "field": "Commerce"
+      }
+    },
+    {
+      "id": "bachelor of computer application",
+      "label": "Bachelor of Computer Applications",
+      "source": "curated_degrees",
+      "aliases": [
+        "Bachelor of Computer Applications",
+        "BCA"
+      ],
+      "attrs": {
+        "level": "6",
+        "field": "Computer Applications"
+      }
+    },
+    {
+      "id": "bachelor of social work",
+      "label": "Bachelor of Social Work",
+      "source": "curated_degrees",
+      "aliases": [
+        "Bachelor of Social Work",
+        "BSW"
+      ],
+      "attrs": {
+        "level": "6",
+        "field": "Social Work"
+      }
+    },
+    {
+      "id": "master s degree",
+      "label": "Master's Degree",
+      "source": "curated_degrees",
+      "aliases": [
+        "Master's Degree",
+        "master",
+        "masters",
+        "master's",
+        "graduate degree"
+      ],
+      "attrs": {
+        "level": "8",
+        "field": null
+      }
+    },
+    {
+      "id": "master of art",
+      "label": "Master of Arts",
+      "source": "curated_degrees",
+      "aliases": [
+        "Master of Arts",
+        "MA",
+        "M.A."
+      ],
+      "attrs": {
+        "level": "8",
+        "field": null
+      }
+    },
+    {
+      "id": "master of science",
+      "label": "Master of Science",
+      "source": "curated_degrees",
+      "aliases": [
+        "Master of Science",
+        "MS",
+        "M.S.",
+        "MSc",
+        "M.Sc."
+      ],
+      "attrs": {
+        "level": "8",
+        "field": null
+      }
+    },
+    {
+      "id": "master of science in nursing",
+      "label": "Master of Science in Nursing",
+      "source": "curated_degrees",
+      "aliases": [
+        "Master of Science in Nursing",
+        "MSN",
+        "M.S.N."
+      ],
+      "attrs": {
+        "level": "8",
+        "field": "Nursing"
+      }
+    },
+    {
+      "id": "master of business administration",
+      "label": "Master of Business Administration",
+      "source": "curated_degrees",
+      "aliases": [
+        "Master of Business Administration",
+        "MBA",
+        "M.B.A."
+      ],
+      "attrs": {
+        "level": "8",
+        "field": "Business Administration"
+      }
+    },
+    {
+      "id": "master of engineering",
+      "label": "Master of Engineering",
+      "source": "curated_degrees",
+      "aliases": [
+        "Master of Engineering",
+        "MEng",
+        "M.Eng."
+      ],
+      "attrs": {
+        "level": "8",
+        "field": "Engineering"
+      }
+    },
+    {
+      "id": "master of technology",
+      "label": "Master of Technology",
+      "source": "curated_degrees",
+      "aliases": [
+        "Master of Technology",
+        "MTech",
+        "M.Tech"
+      ],
+      "attrs": {
+        "level": "8",
+        "field": "Technology"
+      }
+    },
+    {
+      "id": "master of public health",
+      "label": "Master of Public Health",
+      "source": "curated_degrees",
+      "aliases": [
+        "Master of Public Health",
+        "MPH",
+        "M.P.H."
+      ],
+      "attrs": {
+        "level": "8",
+        "field": "Public Health"
+      }
+    },
+    {
+      "id": "master of social work",
+      "label": "Master of Social Work",
+      "source": "curated_degrees",
+      "aliases": [
+        "Master of Social Work",
+        "MSW",
+        "M.S.W."
+      ],
+      "attrs": {
+        "level": "8",
+        "field": "Social Work"
+      }
+    },
+    {
+      "id": "master of education",
+      "label": "Master of Education",
+      "source": "curated_degrees",
+      "aliases": [
+        "Master of Education",
+        "MEd",
+        "M.Ed."
+      ],
+      "attrs": {
+        "level": "8",
+        "field": "Education"
+      }
+    },
+    {
+      "id": "master of fine art",
+      "label": "Master of Fine Arts",
+      "source": "curated_degrees",
+      "aliases": [
+        "Master of Fine Arts",
+        "MFA",
+        "M.F.A."
+      ],
+      "attrs": {
+        "level": "8",
+        "field": "Fine Arts"
+      }
+    },
+    {
+      "id": "master of computer application",
+      "label": "Master of Computer Applications",
+      "source": "curated_degrees",
+      "aliases": [
+        "Master of Computer Applications",
+        "MCA"
+      ],
+      "attrs": {
+        "level": "8",
+        "field": "Computer Applications"
+      }
+    },
+    {
+      "id": "doctor of medicine",
+      "label": "Doctor of Medicine",
+      "source": "curated_degrees",
+      "aliases": [
+        "Doctor of Medicine",
+        "MD",
+        "M.D."
+      ],
+      "attrs": {
+        "level": "10",
+        "field": "Medicine"
+      }
+    },
+    {
+      "id": "juris doctor",
+      "label": "Juris Doctor",
+      "source": "curated_degrees",
+      "aliases": [
+        "Juris Doctor",
+        "JD",
+        "J.D."
+      ],
+      "attrs": {
+        "level": "10",
+        "field": "Law"
+      }
+    },
+    {
+      "id": "doctor of pharmacy",
+      "label": "Doctor of Pharmacy",
+      "source": "curated_degrees",
+      "aliases": [
+        "Doctor of Pharmacy",
+        "PharmD",
+        "Pharm.D."
+      ],
+      "attrs": {
+        "level": "10",
+        "field": "Pharmacy"
+      }
+    },
+    {
+      "id": "doctor of dental surgery",
+      "label": "Doctor of Dental Surgery",
+      "source": "curated_degrees",
+      "aliases": [
+        "Doctor of Dental Surgery",
+        "DDS",
+        "D.D.S.",
+        "DMD"
+      ],
+      "attrs": {
+        "level": "10",
+        "field": "Dentistry"
+      }
+    },
+    {
+      "id": "doctor of veterinary medicine",
+      "label": "Doctor of Veterinary Medicine",
+      "source": "curated_degrees",
+      "aliases": [
+        "Doctor of Veterinary Medicine",
+        "DVM",
+        "D.V.M."
+      ],
+      "attrs": {
+        "level": "10",
+        "field": "Veterinary Medicine"
+      }
+    },
+    {
+      "id": "doctor of physical therapy",
+      "label": "Doctor of Physical Therapy",
+      "source": "curated_degrees",
+      "aliases": [
+        "Doctor of Physical Therapy",
+        "DPT"
+      ],
+      "attrs": {
+        "level": "10",
+        "field": "Physical Therapy"
+      }
+    },
+    {
+      "id": "doctor of nursing practice",
+      "label": "Doctor of Nursing Practice",
+      "source": "curated_degrees",
+      "aliases": [
+        "Doctor of Nursing Practice",
+        "DNP"
+      ],
+      "attrs": {
+        "level": "11",
+        "field": "Nursing"
+      }
+    },
+    {
+      "id": "doctor of philosophy",
+      "label": "Doctor of Philosophy",
+      "source": "curated_degrees",
+      "aliases": [
+        "Doctor of Philosophy",
+        "PhD",
+        "Ph.D.",
+        "Ph.D",
+        "doctorate",
+        "doctoral degree"
+      ],
+      "attrs": {
+        "level": "11",
+        "field": null
+      }
+    },
+    {
+      "id": "doctor of education",
+      "label": "Doctor of Education",
+      "source": "curated_degrees",
+      "aliases": [
+        "Doctor of Education",
+        "EdD",
+        "Ed.D."
+      ],
+      "attrs": {
+        "level": "11",
+        "field": "Education"
+      }
+    }
+  ]
+}

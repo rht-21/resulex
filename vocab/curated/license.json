@@ -1,0 +1,570 @@
+{
+  "type": "license",
+  "entities": [
+    {
+      "id": "registered nurse",
+      "label": "Registered Nurse",
+      "source": "curated_licenses",
+      "aliases": [
+        "Registered Nurse",
+        "registered nurse license",
+        "rn license",
+        "registered professional nurse",
+        "RN license"
+      ],
+      "cased": [
+        "RN"
+      ],
+      "socs": {
+        "29-1141.00": 1.0
+      }
+    },
+    {
+      "id": "licensed practical nurse",
+      "label": "Licensed Practical Nurse",
+      "source": "curated_licenses",
+      "aliases": [
+        "Licensed Practical Nurse",
+        "lpn license"
+      ],
+      "cased": [
+        "LPN"
+      ],
+      "socs": {
+        "29-2061.00": 1.0
+      }
+    },
+    {
+      "id": "licensed vocational nurse",
+      "label": "Licensed Vocational Nurse",
+      "source": "curated_licenses",
+      "aliases": [
+        "Licensed Vocational Nurse",
+        "lvn license"
+      ],
+      "cased": [
+        "LVN"
+      ],
+      "socs": {
+        "29-2061.00": 1.0
+      }
+    },
+    {
+      "id": "certified nursing assistant",
+      "label": "Certified Nursing Assistant",
+      "source": "curated_licenses",
+      "aliases": [
+        "Certified Nursing Assistant",
+        "certified nurse aide",
+        "certified nurse assistant",
+        "state tested nursing assistant",
+        "STNA"
+      ],
+      "cased": [
+        "CNA"
+      ],
+      "socs": {
+        "31-1131.00": 1.0
+      }
+    },
+    {
+      "id": "nurse practitioner",
+      "label": "Nurse Practitioner",
+      "source": "curated_licenses",
+      "aliases": [
+        "Nurse Practitioner",
+        "nurse practitioner license",
+        "APRN license",
+        "ARNP",
+        "advanced registered nurse practitioner",
+        "advanced practice nurse",
+        "certified nurse practitioner",
+        "CNP",
+        "APRN-CNP"
+      ],
+      "cased": [
+        "NP"
+      ],
+      "socs": {
+        "29-1171.00": 1.0
+      }
+    },
+    {
+      "id": "advanced practice registered nurse",
+      "label": "Advanced Practice Registered Nurse",
+      "source": "curated_licenses",
+      "aliases": [
+        "Advanced Practice Registered Nurse"
+      ],
+      "cased": [
+        "APRN"
+      ],
+      "socs": {
+        "29-1171.00": 1.0
+      }
+    },
+    {
+      "id": "certified registered nurse anesthetist",
+      "label": "Certified Registered Nurse Anesthetist",
+      "source": "curated_licenses",
+      "aliases": [
+        "Certified Registered Nurse Anesthetist"
+      ],
+      "cased": [
+        "CRNA"
+      ],
+      "socs": {
+        "29-1151.00": 1.0
+      }
+    },
+    {
+      "id": "certified nurse midwife",
+      "label": "Certified Nurse Midwife",
+      "source": "curated_licenses",
+      "aliases": [
+        "Certified Nurse Midwife"
+      ],
+      "cased": [
+        "CNM"
+      ],
+      "socs": {
+        "29-1161.00": 1.0
+      }
+    },
+    {
+      "id": "physician assistant",
+      "label": "Physician Assistant",
+      "source": "curated_licenses",
+      "aliases": [
+        "Physician Assistant",
+        "physician assistant license",
+        "licensed physician assistant"
+      ],
+      "socs": {
+        "29-1071.00": 1.0
+      }
+    },
+    {
+      "id": "registered pharmacist",
+      "label": "Registered Pharmacist",
+      "source": "curated_licenses",
+      "aliases": [
+        "Registered Pharmacist",
+        "pharmacist license",
+        "licensed pharmacist"
+      ],
+      "cased": [
+        "RPh"
+      ],
+      "socs": {
+        "29-1051.00": 1.0
+      }
+    },
+    {
+      "id": "pharmacy technician",
+      "label": "Pharmacy Technician",
+      "source": "curated_licenses",
+      "aliases": [
+        "Pharmacy Technician",
+        "certified pharmacy technician"
+      ],
+      "cased": [
+        "CPhT"
+      ],
+      "socs": {
+        "29-2052.00": 1.0
+      }
+    },
+    {
+      "id": "registered respiratory therapist",
+      "label": "Registered Respiratory Therapist",
+      "source": "curated_licenses",
+      "aliases": [
+        "Registered Respiratory Therapist",
+        "certified respiratory therapist",
+        "CRT"
+      ],
+      "cased": [
+        "RRT"
+      ],
+      "socs": {
+        "29-1126.00": 1.0
+      }
+    },
+    {
+      "id": "licensed clinical social worker",
+      "label": "Licensed Clinical Social Worker",
+      "source": "curated_licenses",
+      "aliases": [
+        "Licensed Clinical Social Worker"
+      ],
+      "cased": [
+        "LCSW"
+      ],
+      "socs": {
+        "21-1022.00": 1.0
+      }
+    },
+    {
+      "id": "licensed master social worker",
+      "label": "Licensed Master Social Worker",
+      "source": "curated_licenses",
+      "aliases": [
+        "Licensed Master Social Worker"
+      ],
+      "cased": [
+        "LMSW"
+      ],
+      "socs": {
+        "21-1022.00": 1.0
+      }
+    },
+    {
+      "id": "licensed professional counselor",
+      "label": "Licensed Professional Counselor",
+      "source": "curated_licenses",
+      "aliases": [
+        "Licensed Professional Counselor"
+      ],
+      "cased": [
+        "LPC"
+      ],
+      "socs": {
+        "21-1018.00": 1.0
+      }
+    },
+    {
+      "id": "licensed marriage and family therapist",
+      "label": "Licensed Marriage and Family Therapist",
+      "source": "curated_licenses",
+      "aliases": [
+        "Licensed Marriage and Family Therapist"
+      ],
+      "cased": [
+        "LMFT"
+      ],
+      "socs": {
+        "21-1013.00": 1.0
+      }
+    },
+    {
+      "id": "emergency medical technician",
+      "label": "Emergency Medical Technician",
+      "source": "curated_licenses",
+      "aliases": [
+        "Emergency Medical Technician",
+        "emt basic",
+        "emt-b",
+        "nremt"
+      ],
+      "cased": [
+        "EMT"
+      ],
+      "socs": {
+        "29-2042.00": 1.0
+      }
+    },
+    {
+      "id": "paramedic",
+      "label": "Paramedic",
+      "source": "curated_licenses",
+      "aliases": [
+        "Paramedic",
+        "licensed paramedic",
+        "paramedic license"
+      ],
+      "cased": [
+        "EMT-P"
+      ],
+      "socs": {
+        "29-2043.00": 1.0
+      }
+    },
+    {
+      "id": "physical therapist",
+      "label": "Physical Therapist",
+      "source": "curated_licenses",
+      "aliases": [
+        "Physical Therapist",
+        "licensed physical therapist"
+      ],
+      "cased": [
+        "DPT"
+      ],
+      "socs": {
+        "29-1123.00": 1.0
+      }
+    },
+    {
+      "id": "occupational therapist",
+      "label": "Occupational Therapist",
+      "source": "curated_licenses",
+      "aliases": [
+        "Occupational Therapist",
+        "licensed occupational therapist"
+      ],
+      "cased": [
+        "OTR/L"
+      ],
+      "socs": {
+        "29-1122.00": 1.0
+      }
+    },
+    {
+      "id": "speech language pathologist",
+      "label": "Speech-Language Pathologist",
+      "source": "curated_licenses",
+      "aliases": [
+        "Speech-Language Pathologist"
+      ],
+      "cased": [
+        "CCC-SLP"
+      ],
+      "socs": {
+        "29-1127.00": 1.0
+      }
+    },
+    {
+      "id": "medical license",
+      "label": "Medical License",
+      "source": "curated_licenses",
+      "aliases": [
+        "Medical License",
+        "licensed physician",
+        "physician license",
+        "medical license"
+      ],
+      "socs": {
+        "29-1229.00": 1.0
+      }
+    },
+    {
+      "id": "dental hygienist",
+      "label": "Dental Hygienist",
+      "source": "curated_licenses",
+      "aliases": [
+        "Dental Hygienist",
+        "registered dental hygienist"
+      ],
+      "cased": [
+        "RDH"
+      ],
+      "socs": {
+        "29-1292.00": 1.0
+      }
+    },
+    {
+      "id": "certified public accountant",
+      "label": "Certified Public Accountant",
+      "source": "curated_licenses",
+      "aliases": [
+        "Certified Public Accountant"
+      ],
+      "cased": [
+        "CPA"
+      ],
+      "socs": {
+        "13-2011.00": 1.0
+      }
+    },
+    {
+      "id": "professional engineer",
+      "label": "Professional Engineer",
+      "source": "curated_licenses",
+      "aliases": [
+        "Professional Engineer",
+        "licensed professional engineer"
+      ],
+      "cased": [
+        "PE"
+      ]
+    },
+    {
+      "id": "engineer in training",
+      "label": "Engineer in Training",
+      "source": "curated_licenses",
+      "aliases": [
+        "Engineer in Training"
+      ],
+      "cased": [
+        "EIT"
+      ]
+    },
+    {
+      "id": "commercial driver s license",
+      "label": "Commercial Driver's License",
+      "source": "curated_licenses",
+      "aliases": [
+        "Commercial Driver's License",
+        "class a cdl",
+        "class b cdl",
+        "cdl a",
+        "cdl b",
+        "commercial drivers license"
+      ],
+      "cased": [
+        "CDL"
+      ],
+      "socs": {
+        "53-3032.00": 1.0
+      }
+    },
+    {
+      "id": "real estate license",
+      "label": "Real Estate License",
+      "source": "curated_licenses",
+      "aliases": [
+        "Real Estate License",
+        "licensed real estate agent",
+        "real estate salesperson license"
+      ],
+      "socs": {
+        "41-9022.00": 1.0
+      }
+    },
+    {
+      "id": "bar admission",
+      "label": "Bar Admission",
+      "source": "curated_licenses",
+      "aliases": [
+        "Bar Admission",
+        "licensed attorney",
+        "admitted to the bar",
+        "state bar"
+      ],
+      "socs": {
+        "23-1011.00": 1.0
+      }
+    },
+    {
+      "id": "teaching license",
+      "label": "Teaching License",
+      "source": "curated_licenses",
+      "aliases": [
+        "Teaching License",
+        "teaching certificate",
+        "teacher certification",
+        "licensed teacher"
+      ]
+    },
+    {
+      "id": "cosmetology license",
+      "label": "Cosmetology License",
+      "source": "curated_licenses",
+      "aliases": [
+        "Cosmetology License",
+        "licensed cosmetologist"
+      ],
+      "socs": {
+        "39-5012.00": 1.0
+      }
+    },
+    {
+      "id": "journeyman electrician license",
+      "label": "Journeyman Electrician License",
+      "source": "curated_licenses",
+      "aliases": [
+        "Journeyman Electrician License",
+        "journeyman electrician",
+        "licensed electrician"
+      ],
+      "socs": {
+        "47-2111.00": 1.0
+      }
+    },
+    {
+      "id": "master electrician license",
+      "label": "Master Electrician License",
+      "source": "curated_licenses",
+      "aliases": [
+        "Master Electrician License",
+        "master electrician"
+      ],
+      "socs": {
+        "47-2111.00": 1.0
+      }
+    },
+    {
+      "id": "licensed plumber",
+      "label": "Licensed Plumber",
+      "source": "curated_licenses",
+      "aliases": [
+        "Licensed Plumber",
+        "journeyman plumber",
+        "master plumber"
+      ],
+      "socs": {
+        "47-2152.00": 1.0
+      }
+    },
+    {
+      "id": "insurance producer license",
+      "label": "Insurance Producer License",
+      "source": "curated_licenses",
+      "aliases": [
+        "Insurance Producer License",
+        "life and health insurance license",
+        "property and casualty license"
+      ],
+      "socs": {
+        "41-3021.00": 1.0
+      }
+    },
+    {
+      "id": "sery 7",
+      "label": "Series 7",
+      "source": "curated_licenses",
+      "aliases": [
+        "Series 7",
+        "series 7 license"
+      ],
+      "socs": {
+        "41-3031.00": 1.0
+      }
+    },
+    {
+      "id": "sery 63",
+      "label": "Series 63",
+      "source": "curated_licenses",
+      "aliases": [
+        "Series 63",
+        "series 63 license"
+      ],
+      "socs": {
+        "41-3031.00": 1.0
+      }
+    },
+    {
+      "id": "dea registration",
+      "label": "DEA Registration",
+      "source": "curated_licenses",
+      "aliases": [
+        "DEA Registration",
+        "DEA license",
+        "DEA certificate",
+        "DEA number",
+        "DEA registered"
+      ],
+      "cased": [
+        "DEA"
+      ]
+    },
+    {
+      "id": "controlled substance registration",
+      "label": "Controlled Substance Registration",
+      "source": "curated_licenses",
+      "aliases": [
+        "Controlled Substance Registration",
+        "controlled substance license",
+        "controlled substance registration",
+        "state controlled substance",
+        "CSR",
+        "CSC",
+        "CDS license"
+      ],
+      "cased": [
+        "CDS"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,661 @@
+{
+  "type": "language",
+  "entities": [
+    {
+      "id": "english",
+      "label": "English",
+      "source": "curated_languages",
+      "aliases": [
+        "English"
+      ]
+    },
+    {
+      "id": "spanish",
+      "label": "Spanish",
+      "source": "curated_languages",
+      "aliases": [
+        "Spanish",
+        "Castilian"
+      ]
+    },
+    {
+      "id": "french",
+      "label": "French",
+      "source": "curated_languages",
+      "aliases": [
+        "French"
+      ]
+    },
+    {
+      "id": "german",
+      "label": "German",
+      "source": "curated_languages",
+      "aliases": [
+        "German"
+      ]
+    },
+    {
+      "id": "italian",
+      "label": "Italian",
+      "source": "curated_languages",
+      "aliases": [
+        "Italian"
+      ]
+    },
+    {
+      "id": "portuguese",
+      "label": "Portuguese",
+      "source": "curated_languages",
+      "aliases": [
+        "Portuguese"
+      ]
+    },
+    {
+      "id": "russian",
+      "label": "Russian",
+      "source": "curated_languages",
+      "aliases": [
+        "Russian"
+      ]
+    },
+    {
+      "id": "ukrainian",
+      "label": "Ukrainian",
+      "source": "curated_languages",
+      "aliases": [
+        "Ukrainian"
+      ]
+    },
+    {
+      "id": "polish",
+      "label": "Polish",
+      "source": "curated_languages",
+      "aliases": [
+        "Polish"
+      ]
+    },
+    {
+      "id": "czech",
+      "label": "Czech",
+      "source": "curated_languages",
+      "aliases": [
+        "Czech"
+      ]
+    },
+    {
+      "id": "slovak",
+      "label": "Slovak",
+      "source": "curated_languages",
+      "aliases": [
+        "Slovak"
+      ]
+    },
+    {
+      "id": "hungarian",
+      "label": "Hungarian",
+      "source": "curated_languages",
+      "aliases": [
+        "Hungarian"
+      ]
+    },
+    {
+      "id": "romanian",
+      "label": "Romanian",
+      "source": "curated_languages",
+      "aliases": [
+        "Romanian"
+      ]
+    },
+    {
+      "id": "bulgarian",
+      "label": "Bulgarian",
+      "source": "curated_languages",
+      "aliases": [
+        "Bulgarian"
+      ]
+    },
+    {
+      "id": "serbian",
+      "label": "Serbian",
+      "source": "curated_languages",
+      "aliases": [
+        "Serbian"
+      ]
+    },
+    {
+      "id": "croatian",
+      "label": "Croatian",
+      "source": "curated_languages",
+      "aliases": [
+        "Croatian"
+      ]
+    },
+    {
+      "id": "bosnian",
+      "label": "Bosnian",
+      "source": "curated_languages",
+      "aliases": [
+        "Bosnian"
+      ]
+    },
+    {
+      "id": "greek",
+      "label": "Greek",
+      "source": "curated_languages",
+      "aliases": [
+        "Greek"
+      ]
+    },
+    {
+      "id": "turkish",
+      "label": "Turkish",
+      "source": "curated_languages",
+      "aliases": [
+        "Turkish"
+      ]
+    },
+    {
+      "id": "arabic",
+      "label": "Arabic",
+      "source": "curated_languages",
+      "aliases": [
+        "Arabic"
+      ]
+    },
+    {
+      "id": "hebrew",
+      "label": "Hebrew",
+      "source": "curated_languages",
+      "aliases": [
+        "Hebrew"
+      ]
+    },
+    {
+      "id": "persian",
+      "label": "Persian",
+      "source": "curated_languages",
+      "aliases": [
+        "Persian",
+        "Farsi"
+      ]
+    },
+    {
+      "id": "urdu",
+      "label": "Urdu",
+      "source": "curated_languages",
+      "aliases": [
+        "Urdu"
+      ]
+    },
+    {
+      "id": "hindi",
+      "label": "Hindi",
+      "source": "curated_languages",
+      "aliases": [
+        "Hindi"
+      ]
+    },
+    {
+      "id": "bengali",
+      "label": "Bengali",
+      "source": "curated_languages",
+      "aliases": [
+        "Bengali",
+        "Bangla"
+      ]
+    },
+    {
+      "id": "punjabi",
+      "label": "Punjabi",
+      "source": "curated_languages",
+      "aliases": [
+        "Punjabi"
+      ]
+    },
+    {
+      "id": "gujarati",
+      "label": "Gujarati",
+      "source": "curated_languages",
+      "aliases": [
+        "Gujarati"
+      ]
+    },
+    {
+      "id": "marathi",
+      "label": "Marathi",
+      "source": "curated_languages",
+      "aliases": [
+        "Marathi"
+      ]
+    },
+    {
+      "id": "tamil",
+      "label": "Tamil",
+      "source": "curated_languages",
+      "aliases": [
+        "Tamil"
+      ]
+    },
+    {
+      "id": "telugu",
+      "label": "Telugu",
+      "source": "curated_languages",
+      "aliases": [
+        "Telugu"
+      ]
+    },
+    {
+      "id": "kannada",
+      "label": "Kannada",
+      "source": "curated_languages",
+      "aliases": [
+        "Kannada"
+      ]
+    },
+    {
+      "id": "malayalam",
+      "label": "Malayalam",
+      "source": "curated_languages",
+      "aliases": [
+        "Malayalam"
+      ]
+    },
+    {
+      "id": "nepali",
+      "label": "Nepali",
+      "source": "curated_languages",
+      "aliases": [
+        "Nepali"
+      ]
+    },
+    {
+      "id": "sinhala",
+      "label": "Sinhala",
+      "source": "curated_languages",
+      "aliases": [
+        "Sinhala"
+      ]
+    },
+    {
+      "id": "mandarin",
+      "label": "Mandarin",
+      "source": "curated_languages",
+      "aliases": [
+        "Mandarin",
+        "Mandarin Chinese"
+      ]
+    },
+    {
+      "id": "cantonese",
+      "label": "Cantonese",
+      "source": "curated_languages",
+      "aliases": [
+        "Cantonese"
+      ]
+    },
+    {
+      "id": "chinese",
+      "label": "Chinese",
+      "source": "curated_languages",
+      "aliases": [
+        "Chinese"
+      ]
+    },
+    {
+      "id": "japanese",
+      "label": "Japanese",
+      "source": "curated_languages",
+      "aliases": [
+        "Japanese"
+      ]
+    },
+    {
+      "id": "korean",
+      "label": "Korean",
+      "source": "curated_languages",
+      "aliases": [
+        "Korean"
+      ]
+    },
+    {
+      "id": "vietnamese",
+      "label": "Vietnamese",
+      "source": "curated_languages",
+      "aliases": [
+        "Vietnamese"
+      ]
+    },
+    {
+      "id": "thai",
+      "label": "Thai",
+      "source": "curated_languages",
+      "aliases": [
+        "Thai"
+      ]
+    },
+    {
+      "id": "lao",
+      "label": "Lao",
+      "source": "curated_languages",
+      "aliases": [
+        "Lao"
+      ]
+    },
+    {
+      "id": "khmer",
+      "label": "Khmer",
+      "source": "curated_languages",
+      "aliases": [
+        "Khmer"
+      ]
+    },
+    {
+      "id": "burmese",
+      "label": "Burmese",
+      "source": "curated_languages",
+      "aliases": [
+        "Burmese"
+      ]
+    },
+    {
+      "id": "filipino",
+      "label": "Filipino",
+      "source": "curated_languages",
+      "aliases": [
+        "Filipino",
+        "Tagalog"
+      ]
+    },
+    {
+      "id": "indonesian",
+      "label": "Indonesian",
+      "source": "curated_languages",
+      "aliases": [
+        "Indonesian"
+      ]
+    },
+    {
+      "id": "malay",
+      "label": "Malay",
+      "source": "curated_languages",
+      "aliases": [
+        "Malay"
+      ]
+    },
+    {
+      "id": "swahili",
+      "label": "Swahili",
+      "source": "curated_languages",
+      "aliases": [
+        "Swahili"
+      ]
+    },
+    {
+      "id": "amharic",
+      "label": "Amharic",
+      "source": "curated_languages",
+      "aliases": [
+        "Amharic"
+      ]
+    },
+    {
+      "id": "somali",
+      "label": "Somali",
+      "source": "curated_languages",
+      "aliases": [
+        "Somali"
+      ]
+    },
+    {
+      "id": "yoruba",
+      "label": "Yoruba",
+      "source": "curated_languages",
+      "aliases": [
+        "Yoruba"
+      ]
+    },
+    {
+      "id": "igbo",
+      "label": "Igbo",
+      "source": "curated_languages",
+      "aliases": [
+        "Igbo"
+      ]
+    },
+    {
+      "id": "hausa",
+      "label": "Hausa",
+      "source": "curated_languages",
+      "aliases": [
+        "Hausa"
+      ]
+    },
+    {
+      "id": "zulu",
+      "label": "Zulu",
+      "source": "curated_languages",
+      "aliases": [
+        "Zulu"
+      ]
+    },
+    {
+      "id": "afrikaan",
+      "label": "Afrikaans",
+      "source": "curated_languages",
+      "aliases": [
+        "Afrikaans"
+      ]
+    },
+    {
+      "id": "dutch",
+      "label": "Dutch",
+      "source": "curated_languages",
+      "aliases": [
+        "Dutch",
+        "Flemish"
+      ]
+    },
+    {
+      "id": "swedish",
+      "label": "Swedish",
+      "source": "curated_languages",
+      "aliases": [
+        "Swedish"
+      ]
+    },
+    {
+      "id": "norwegian",
+      "label": "Norwegian",
+      "source": "curated_languages",
+      "aliases": [
+        "Norwegian"
+      ]
+    },
+    {
+      "id": "danish",
+      "label": "Danish",
+      "source": "curated_languages",
+      "aliases": [
+        "Danish"
+      ]
+    },
+    {
+      "id": "finnish",
+      "label": "Finnish",
+      "source": "curated_languages",
+      "aliases": [
+        "Finnish"
+      ]
+    },
+    {
+      "id": "icelandic",
+      "label": "Icelandic",
+      "source": "curated_languages",
+      "aliases": [
+        "Icelandic"
+      ]
+    },
+    {
+      "id": "haitian creole",
+      "label": "Haitian Creole",
+      "source": "curated_languages",
+      "aliases": [
+        "Haitian Creole",
+        "Creole"
+      ]
+    },
+    {
+      "id": "american sign language",
+      "label": "American Sign Language",
+      "source": "curated_languages",
+      "aliases": [
+        "American Sign Language",
+        "ASL"
+      ]
+    },
+    {
+      "id": "hmong",
+      "label": "Hmong",
+      "source": "curated_languages",
+      "aliases": [
+        "Hmong"
+      ]
+    },
+    {
+      "id": "karen",
+      "label": "Karen",
+      "source": "curated_languages",
+      "aliases": [
+        "Karen"
+      ]
+    },
+    {
+      "id": "pashto",
+      "label": "Pashto",
+      "source": "curated_languages",
+      "aliases": [
+        "Pashto"
+      ]
+    },
+    {
+      "id": "dari",
+      "label": "Dari",
+      "source": "curated_languages",
+      "aliases": [
+        "Dari"
+      ]
+    },
+    {
+      "id": "kurdish",
+      "label": "Kurdish",
+      "source": "curated_languages",
+      "aliases": [
+        "Kurdish"
+      ]
+    },
+    {
+      "id": "armenian",
+      "label": "Armenian",
+      "source": "curated_languages",
+      "aliases": [
+        "Armenian"
+      ]
+    },
+    {
+      "id": "georgian",
+      "label": "Georgian",
+      "source": "curated_languages",
+      "aliases": [
+        "Georgian"
+      ]
+    },
+    {
+      "id": "albanian",
+      "label": "Albanian",
+      "source": "curated_languages",
+      "aliases": [
+        "Albanian"
+      ]
+    },
+    {
+      "id": "lithuanian",
+      "label": "Lithuanian",
+      "source": "curated_languages",
+      "aliases": [
+        "Lithuanian"
+      ]
+    },
+    {
+      "id": "latvian",
+      "label": "Latvian",
+      "source": "curated_languages",
+      "aliases": [
+        "Latvian"
+      ]
+    },
+    {
+      "id": "estonian",
+      "label": "Estonian",
+      "source": "curated_languages",
+      "aliases": [
+        "Estonian"
+      ]
+    },
+    {
+      "id": "slovenian",
+      "label": "Slovenian",
+      "source": "curated_languages",
+      "aliases": [
+        "Slovenian"
+      ]
+    },
+    {
+      "id": "macedonian",
+      "label": "Macedonian",
+      "source": "curated_languages",
+      "aliases": [
+        "Macedonian"
+      ]
+    },
+    {
+      "id": "catalan",
+      "label": "Catalan",
+      "source": "curated_languages",
+      "aliases": [
+        "Catalan"
+      ]
+    },
+    {
+      "id": "basque",
+      "label": "Basque",
+      "source": "curated_languages",
+      "aliases": [
+        "Basque"
+      ]
+    },
+    {
+      "id": "irish",
+      "label": "Irish",
+      "source": "curated_languages",
+      "aliases": [
+        "Irish"
+      ]
+    },
+    {
+      "id": "welsh",
+      "label": "Welsh",
+      "source": "curated_languages",
+      "aliases": [
+        "Welsh"
+      ]
+    },
+    {
+      "id": "latin",
+      "label": "Latin",
+      "source": "curated_languages",
+      "aliases": [
+        "Latin"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "removals": {
+    "license": [
+      "nurse licensure compact",
+      "compact license",
+      "NLC license",
+      "multistate license",
+      "multi state license",
+      "compact state license",
+      "active license"
+    ],
+    "language": [
+      "bilingual",
+      "multilingual",
+      "bilingual preferred",
+      "bilingual candidate"
+    ]
+  },
+  "notes": {
+    "license": "A nurse licensure compact is a status of an RN license, not a license of its own.",
+    "language": "keywords.json lists 'Bilingual' as a language (a job-description flag); here it is a proficiency."
+  }
+}
