@@ -1,0 +1,189 @@
+# Parser settings. The vocabulary itself lives in vocab/:
+#   vocab/curated/   our hand-maintained lists (edit these)
+#   vocab/imported/  generated from raw reference data by tools/import_vocab.py (do not edit by hand)
+# Each vocab file is {"type": ..., "entities": [{id, label, source, aliases, cased, socs, attrs}]};
+# removals.json lists phrases to drop per type.
+
+index = "index.pkl"
+
+[vocab]
+dir = "vocab"
+# Load order; for each type the curated file loads before the imported one.
+types = ["title", "license", "cert", "degree", "language", "org", "specialty", "tech", "tool", "skill",
+         "seniority", "work_mode", "shift", "employment_type"]
+
+[build]
+# Skills in the data are often verb phrases ("administer medication"); resumes say "medication administration".
+nominalize_types = ["skill"]
+# Software in the data carries its vendor ("Microsoft Excel"); resumes usually drop it ("Excel").
+vendor_types = ["tech"]
+vendor_prefixes = ["Microsoft", "Adobe", "Oracle", "IBM", "Google", "SAP", "Autodesk", "Apple", "Amazon",
+                   "Salesforce", "Intuit", "Cisco", "VMware", "Atlassian", "Epic Systems", "Cerner", "Meditech"]
+
+[build.nominalize]
+administer = "administration"
+manage = "management"
+monitor = "monitoring"
+educate = "education"
+assess = "assessment"
+coordinate = "coordination"
+plan = "planning"
+develop = "development"
+analyse = "analysis"
+analyze = "analysis"
+maintain = "maintenance"
+operate = "operation"
+interpret = "interpretation"
+document = "documentation"
+supervise = "supervision"
+train = "training"
+prepare = "preparation"
+evaluate = "evaluation"
+implement = "implementation"
+insert = "insertion"
+measure = "measurement"
+test = "testing"
+treat = "treatment"
+diagnose = "diagnosis"
+prescribe = "prescribing"
+schedule = "scheduling"
+install = "installation"
+repair = "repair"
+inspect = "inspection"
+calibrate = "calibration"
+troubleshoot = "troubleshooting"
+design = "design"
+budget = "budgeting"
+forecast = "forecasting"
+recruit = "recruitment"
+counsel = "counseling"
+negotiate = "negotiation"
+audit = "auditing"
+process = "processing"
+prevent = "prevention"
+control = "control"
+dispense = "dispensing"
+compound = "compounding"
+cook = "cooking"
+
+[occupation_groups]   # O*NET-SOC major groups (first two digits of the code)
+11 = "Management Occupations"
+13 = "Business and Financial Operations Occupations"
+15 = "Computer and Mathematical Occupations"
+17 = "Architecture and Engineering Occupations"
+19 = "Life, Physical, and Social Science Occupations"
+21 = "Community and Social Service Occupations"
+23 = "Legal Occupations"
+25 = "Educational Instruction and Library Occupations"
+27 = "Arts, Design, Entertainment, Sports, and Media Occupations"
+29 = "Healthcare Practitioners and Technical Occupations"
+31 = "Healthcare Support Occupations"
+33 = "Protective Service Occupations"
+35 = "Food Preparation and Serving Related Occupations"
+37 = "Building and Grounds Cleaning and Maintenance Occupations"
+39 = "Personal Care and Service Occupations"
+41 = "Sales and Related Occupations"
+43 = "Office and Administrative Support Occupations"
+45 = "Farming, Fishing, and Forestry Occupations"
+47 = "Construction and Extraction Occupations"
+49 = "Installation, Maintenance, and Repair Occupations"
+51 = "Production Occupations"
+53 = "Transportation and Material Moving Occupations"
+55 = "Military Specific Occupations"
+
+[match]
+# Certifications, licenses and skills link only to entities of the profile's major group. A second group is
+# also used when its weight is at least this share of the top one (1.0 = only the top group).
+related_group_ratio = 1.0
+# Acronyms that in running text almost always mean something other than a credential (EMR = medical record)
+running_text_acronym_stoplist = ["EMR", "EHR", "CRM", "PPE", "CVS", "ERP", "API", "SQL", "KPI", "ROI", "SOP"]
+min_confidence = 0.45
+coherence_boost = 0.3
+# Specificity = a + b*(words-1) + c*rarity, capped at 1
+spec_a = 0.35
+spec_b = 0.25
+spec_c = 0.45
+stoplist = [
+  "health", "testing", "training", "communication", "documentation", "management", "support",
+  "care", "planning", "education", "research", "service", "services", "work", "team", "staff",
+  "programs", "sessions", "workflows", "day", "data", "development", "operations", "records",
+  "resources", "public", "patients", "patient", "families", "clinic", "onboarding", "follow up",
+]
+
+# Dropped from the end of a phrase taken from a bullet ("public health settings" -> "public health")
+generic_heads = [
+  "settings", "duties", "sessions", "programs", "patients", "families", "staff", "assistants", "resources",
+  "rates", "assignments", "activities", "tasks", "efforts", "initiatives", "needs", "issues", "items", "teams",
+  "members", "clients", "customers", "users", "people", "projects", "processes", "services", "operations",
+  "experiences", "environments", "concepts", "details", "data", "standards", "units", "courses", "risks", "gaps",
+  "populations", "pathways", "trends", "outcomes", "goals", "levels", "areas", "matters",
+  "physicians", "nurses", "pharmacies", "therapists", "residents", "providers", "doctors", "students", "vendors",
+  "stakeholders", "partners", "departments", "managers", "supervisors", "physician", "family", "etc",
+  "role", "roles", "passion", "flexibility", "setting", "dignity", "commitment", "ability", "abilities",
+  "opportunity", "opportunities", "career", "growth", "success", "excellence", "purpose", "interest", "motivation",
+  "part", "way", "variety", "range", "number", "basis", "respect", "confidence", "dedication", "desire",
+]
+# Dropped from the start of a phrase taken from a bullet ("timely clinical documentation" -> "clinical documentation")
+filler_adjectives = [
+  "timely", "high-quality", "quality", "comprehensive", "advanced", "effective", "accurate", "safe", "direct",
+  "compassionate", "engaging", "professional", "various", "diverse", "new", "daily", "multiple", "complex", "high",
+  "key", "strong", "excellent", "efficient", "appropriate", "individualized", "personalized", "exceptional",
+  "seamless", "dynamic", "ongoing", "routine", "overall", "proper", "optimal", "positive", "relevant", "specific",
+  "high-acuity", "high-volume", "fast-paced", "hands-on",
+]
+# Specificity of a skill not found in the data, by word count (1, 2, 3+)
+unlinked_spec = [0.6, 0.8, 0.9]
+# A phrase from running text whose last word ends fewer than this many known skills counts less
+head_support_min = 5
+unsupported_head_factor = 0.6
+
+[match.base]          # how much a match counts, by how it was found
+list_item = 0.9       # an item in a skills list
+phrase = 0.8          # a data phrase found in running text
+action_object = 0.8   # what a bullet's verb acts on ("performed intake assessments")
+inline_list = 0.95    # an item of a comma list inside a sentence ("suturing, splinting, IV hydration")
+
+[match.section]       # how much a match counts, by the section it was found in
+skills = 1.0
+summary = 0.85
+experience = 0.85
+certifications = 1.0
+education = 0.6
+other = 0.6
+top = 0.8
+
+[sections]
+summary = ["summary", "professional summary", "career summary", "profile", "professional profile",
+           "objective", "career objective", "about", "about me", "overview", "highlights"]
+experience = ["experience", "work experience", "professional experience", "employment", "employment history",
+              "work history", "career history", "relevant experience", "clinical experience", "positions",
+              "work", "current", "past", "professional history", "career experience", "employment experience"]
+education = ["education", "academic background", "education and training", "academics"]
+skills = ["qualifications", "qualifications summary", "summary of qualifications", "key qualifications",
+          "highlights of qualifications", "qualification highlights", "skills summary", "skill highlights",
+          "skills", "technical skills", "core competencies", "competencies", "key skills", "areas of expertise",
+          "expertise", "technologies", "tools", "skills and abilities", "core skills", "clinical skills",
+          "technical proficiencies", "proficiencies"]
+certifications = ["certifications", "certificates", "licenses", "licensure", "licenses and certifications",
+                  "certifications and licenses", "credentials", "licenses certifications", "certification"]
+languages = ["languages", "language skills", "language"]
+projects = ["projects", "personal projects", "key projects"]
+awards = ["awards", "honors", "honors and awards", "achievements", "accomplishments"]
+publications = ["publications", "research", "presentations"]
+volunteer = ["volunteer", "volunteering", "volunteer experience", "community involvement", "leadership"]
+interests = ["interests", "hobbies", "activities"]
+memberships = ["affiliations", "memberships", "professional affiliations", "professional memberships",
+               "organizations", "professional organizations"]
+availability = ["availability"]
+references = ["references"]
+# Labeled profile exports: "Location" / "Mobile" / "Work Phone" / "Job Title" / "Industry" / "Work" / "Current"
+location = ["location", "address", "current location"]
+mobile = ["mobile", "cell", "mobile phone", "cell phone"]
+work_phone = ["work phone", "office phone", "business phone"]
+job_title = ["job title", "current title"]
+industry = ["industry"]
+
+[languages]
+proficiency = ["native", "fluent", "bilingual", "proficient", "conversational", "intermediate", "basic",
+               "elementary", "advanced", "professional working", "limited working", "a1", "a2", "b1", "b2",
+               "c1", "c2"]
