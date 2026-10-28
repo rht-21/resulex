@@ -37,6 +37,8 @@ ORG = re.compile(
     r"Technologies|Labs|Laboratories|Foundation|Partners|Associates|Pharmacy|Consulting|Industries|"
     r"International|Holdings|Enterprises|Network|Association|Authority|Office)\b\.?"
 )
+# Unfilled resume-template text: "Name of Certificate/Degree/Certification", "Name of School".
+TEMPLATE_PROMPT = re.compile(r"\bName of [A-Za-z]+(?:\s*/\s*[A-Za-z]+)*")
 SCHOOL_WORDS = re.compile(r"\b(?:University|College|Institute|School|Academy|Polytechnic|Conservatory|Seminary)\b")
 CAP_RUN = re.compile(r"(?:[A-Z][\w&.'’-]*|of|the|and|for|at|&)(?:\s+(?:[A-Z][\w&.'’-]*|of|the|and|for|at|&))*")
 ISSUER = re.compile(
@@ -583,6 +585,7 @@ def parse_education(lines, index):
 
 def education_fields(line, index):
     e = {"degree": None, "level": None, "field": None, "school": None, "location": None, "year": None, "gpa": None}
+    line = TEMPLATE_PROMPT.sub("", line)
     loc, span = find_location(line, index)
     if loc:
         e["location"] = loc
