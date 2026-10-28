@@ -170,7 +170,8 @@ languages = ["languages", "language skills", "language"]
 projects = ["projects", "personal projects", "key projects"]
 awards = ["awards", "honors", "honors and awards", "achievements", "accomplishments"]
 publications = ["publications", "research", "presentations"]
-volunteer = ["volunteer", "volunteering", "volunteer experience", "community involvement", "leadership"]
+volunteer = ["volunteer", "volunteering", "volunteer experience", "volunteer service", "volunteer work",
+             "community service", "community involvement", "leadership"]
 interests = ["interests", "hobbies", "activities"]
 memberships = ["affiliations", "memberships", "professional affiliations", "professional memberships",
                "organizations", "professional organizations"]
