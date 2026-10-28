@@ -638,10 +638,19 @@ def split_pair(part, index):
     return [part]
 
 
+def without_description(item):
+    """'Certified Trainer: Certified to develop and lead training.' -> 'Certified Trainer'; 'AHA: BLS, ACLS' stays."""
+    head, sep, tail = item.partition(": ")
+    words = tail.split()
+    if sep and len(words) >= 4 and sum(w[0].islower() for w in words) >= len(words) / 2:
+        return head
+    return item
+
+
 def credential_items(lines, index):
     """Items of a credentials section; a line listing several ('BLS, ACLS, PALS') becomes one item each."""
     out = []
-    for item in line_items(lines):
+    for item in map(without_description, line_items(lines)):
         parts = [s for p in split_outside_parens(item, ",;|•") for s in split_pair(p, index)]
         # An issuer part ("National Board of Certification for ...") is not a credential of its own.
         named = [
