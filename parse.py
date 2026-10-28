@@ -276,7 +276,14 @@ def entry_blocks(lines):
             cur["bullets"].append(BULLET.sub("", line))
         elif cur and cur["bullets"] and not after_blank and continues(cur["bullets"][-1], line):
             cur["bullets"][-1] += " " + line
-        elif cur and cur["bullets"] and has_date(line) and len(line.split()) <= 20 and not line.endswith("."):
+        # A dated header-like line after bullets or after another dated header (two roles listed back to back).
+        elif (
+            cur
+            and (cur["bullets"] or dated(cur))
+            and has_date(line)
+            and len(line.split()) <= 20
+            and not line.endswith(".")
+        ):
             entries.append({"head": [line], "bullets": []})
         elif cur and dated(cur) and not title_like(line):
             cur["bullets"].append(line)
