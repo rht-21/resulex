@@ -32,6 +32,17 @@ uv run python cli.py parse resume.txt --today 2026-10-30
 `--today` is the date used for "Present" when computing job durations (default: today). Pass a fixed
 date to get reproducible output.
 
+### Browser UI
+
+```sh
+uv run python ui/server.py              # http://127.0.0.1:8000
+uv run python ui/server.py --port 9000
+```
+
+Paste text or drop a `.txt` file and press **Extract** (⌘/Ctrl + Enter). The page shows the extracted
+fields next to the source text, with every value linked to the place in the text it came from. The server
+listens on localhost only, since resumes are personal data.
+
 ### Output
 
 The top-level fields are:
@@ -92,6 +103,7 @@ The modules:
 | `build.py` | Compiles `vocab/` into `index.pkl` |
 | `config.toml` | Section headers, scoring weights, stoplists, occupation groups |
 | `tools/import_vocab.py` | Generates `vocab/imported/` from raw reference data |
+| `ui/` | Browser UI: `server.py` serves the page and a `/api/parse` endpoint |
 
 ## Vocabulary
 
