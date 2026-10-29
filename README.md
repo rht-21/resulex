@@ -81,6 +81,90 @@ without a matching `.json` are skipped.
 Real resumes are personal data: `eval/`, `resume.txt` and `*.resume.txt` are gitignored. Keep them out of
 the repository.
 
+### How accuracy is calculated
+
+No accuracy figures are published here: they depend on the labeled set in `eval/`, which stays private.
+Run `eval` on your own set to get them.
+
+For each field, `eval` turns the expected and the parsed value into a set of strings and compares the
+sets. The strings are exact matches after this per-field normalization (from `EVAL_FIELDS` in `cli.py`):
+
+| Field | Compared as |
+|---|---|
+| `name`, `email`, `phone`, `total_experience_months` | the value itself |
+| `location` | `"City, ST ZIP"` |
+| `occupation_group` | the SOC code, e.g. `29-0000` |
+| `experience` | `"title @ company [start..end]"` per job; a job counts only if all four parts match |
+| `education` | `"degree @ school"` |
+| `licenses`, `certifications` | `name` |
+| `specialties` | `text` |
+| `skills` | `text`, lowercased |
+| `languages` | `language` |
+| `availability` | `"field:value"`, e.g. `work_mode:remote` |
+
+Summed over all resumes, per field:
+
+- **found** = |expected ∩ parsed|
+- **missed** = |expected − parsed|
+- **extra** = |parsed − expected|
+
+`eval` prints these three counts. Precision, recall and F1 follow from them:
+
+- **precision** = found / (found + extra): how much of what the parser returned is right
+- **recall** = found / (found + missed): how much of what is in the resume the parser got
+- **F1** = 2 · precision · recall / (precision + recall)
+
+A field that is empty in the expected answers and empty in the parse adds nothing to any count.
+
+### How confidence is calculated
+
+`confidence` (0–1) on skills, specialties, licenses and certifications is a score, not a measured
+probability. A match that links to a vocabulary entity scores (`score` in `match.py`):
+
+```
+confidence = min(1, base × specificity × section × (1 + coherence_boost × coherence))
+```
+
+| Term | Meaning | Values (`config.toml`) |
+|---|---|---|
+| `base` | How the phrase was found (`[match.base]`) | inline list item 0.95, skills-list item 0.9, phrase in running text 0.8, object of a bullet's verb 0.8 |
+| `specificity` | How telling the phrase is, computed at build time | see below |
+| `section` | Where it was found (`[match.section]`) | skills, certifications 1.0; summary, experience 0.85; top 0.8; education, other 0.6 |
+| `coherence` | How strongly the entity is linked to the resume's likely occupations: the highest (occupation weight × O*NET link weight) over those occupations | 0–1 |
+| `coherence_boost` | Weight of that link | 0.3 |
+
+**Specificity** rewards longer and rarer phrases (`specificity` in `build.py`):
+
+```
+rarity      = 1 − ln(df) / ln(N)
+specificity = min(1, 0.35 + 0.25 × (words − 1) + 0.45 × rarity)
+```
+
+`N` is the number of phrases in the index, and `df` is how many index phrases contain this phrase (as
+itself or as a run of up to four words). A one-word phrase that appears nowhere else gets 0.35 + 0.45 = 0.8;
+any two-word phrase that appears nowhere else reaches the cap of 1.
+
+A skill that matches no vocabulary entity can still be kept if it was listed (a skills-list item or an
+inline list). It scores `base × unlinked_spec × section`, where `unlinked_spec` is 0.6, 0.8 or 0.9 for
+1, 2 or 3+ words. Outside the skills section, a phrase whose last word ends fewer than 5 known skills
+(`head_support_min`) is multiplied by a further 0.6 (`unsupported_head_factor`).
+
+Example: "Outbound prospecting and lead generation" in a skills list matches no entity, so it scores
+0.9 (list item) × 0.9 (five words) × 1.0 (skills section) = **0.81**.
+
+Results below `min_confidence` (0.45) are dropped. An entity tied only to other occupation groups than the
+resume's is not linked at all; one tied to no occupation (such as CPR) always can be. An acronym that names several unrelated entities with no occupation link is also not
+linked: "EMR" in a nurse's resume is not read as the EMT credential.
+
+### What the browser UI's numbers mean
+
+The UI's **text mapped** and **values located** figures measure how well the output lines up with the
+text, not whether it is correct:
+
+- **text mapped** = non-blank characters covered by some located value ÷ all non-blank characters
+- **values located** = extracted values found verbatim in the text ÷ all extracted values (derived fields
+  such as the occupation group are not counted)
+
 ## How it works
 
 1. **Sections** — lines are split into sections by header words listed in `[sections]` of `config.toml`.
