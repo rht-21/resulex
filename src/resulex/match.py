@@ -91,14 +91,17 @@ def config_hash(config_text):
 
 
 def vocab_stamp(vocab_dir):
-    """Fingerprint of the vocab files (names, sizes, modification times): cheap enough to check on every load."""
-    rows = []
-    for root, _, files in os.walk(vocab_dir):
+    """Fingerprint of the vocab files' paths and contents; not mtimes, which change when a wheel is installed."""
+    h = hashlib.sha1()
+    for root, dirs, files in os.walk(vocab_dir):
+        dirs.sort()
         for name in sorted(files):
             if name.endswith(".json"):
-                st = os.stat(os.path.join(root, name))
-                rows.append(f"{os.path.relpath(os.path.join(root, name), vocab_dir)}:{st.st_size}:{st.st_mtime_ns}")
-    return hashlib.sha1("\n".join(sorted(rows)).encode()).hexdigest()
+                path = os.path.join(root, name)
+                h.update(os.path.relpath(path, vocab_dir).replace(os.sep, "/").encode() + b"\0")
+                with open(path, "rb") as f:
+                    h.update(f.read())
+    return h.hexdigest()
 
 
 def load_index(path, config_text, vocab_dir):
