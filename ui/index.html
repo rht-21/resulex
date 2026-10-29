@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ResuLex</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><span class="logo" aria-hidden="true"></span>ResuLex</div>
+    <div class="actions">
+      <label class="field">
+        <span>Today</span>
+        <input type="date" id="today" title="Date used for 'Present'">
+      </label>
+      <label class="btn ghost" title="Open a plain-text resume">
+        <input type="file" id="file" accept=".txt,text/plain" hidden>Open .txt
+      </label>
+      <button class="btn primary" id="parse">Extract <kbd>⌘↵</kbd></button>
+    </div>
+  </header>
+
+  <section class="stats" id="stats" hidden>
+    <div class="metrics" id="metrics"></div>
+    <div class="legend" id="legend" role="group" aria-label="Show or hide categories"></div>
+    <label class="switch"><input type="checkbox" id="dim" checked><span>Dim unmapped text</span></label>
+  </section>
+
+  <main class="panes">
+    <section class="pane source" id="source">
+      <div class="pane-head">
+        <div class="tabs" role="tablist">
+          <button role="tab" class="tab" data-view="annotated" id="tab-annotated" disabled>Annotated</button>
+          <button role="tab" class="tab active" data-view="edit" id="tab-edit">Edit</button>
+        </div>
+        <span class="hint" id="source-hint">Paste text or drop a .txt file</span>
+      </div>
+      <div class="pane-body">
+        <textarea id="input" spellcheck="false" placeholder="Paste a resume, job profile or any text here…&#10;&#10;Then press Extract (⌘/Ctrl + Enter)."></textarea>
+        <div class="doc-wrap" id="doc-wrap" hidden>
+          <div class="doc" id="doc"></div>
+          <div class="rail" id="rail" aria-hidden="true"><div class="rail-vp" id="rail-vp"></div></div>
+        </div>
+        <div class="drop" id="drop" hidden>Drop to load text</div>
+      </div>
+    </section>
+
+    <section class="pane results">
+      <div class="pane-head">
+        <div class="tabs" role="tablist">
+          <button role="tab" class="tab active" data-out="fields">Extracted</button>
+          <button role="tab" class="tab" data-out="json">JSON</button>
+        </div>
+        <button class="btn ghost small" id="copy" hidden>Copy JSON</button>
+      </div>
+      <div class="pane-body scroll" id="out">
+        <div class="empty">
+          <div class="empty-art" aria-hidden="true"><span></span><span></span><span></span></div>
+          <h2>Nothing extracted yet</h2>
+          <p>Paste text on the left and press <b>Extract</b>. Every value found is linked back to the exact place in the text it came from — hover or click either side.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="tip" id="tip" hidden></div>
+  <div class="toast" id="toast" hidden></div>
+  <script src="app.js"></script>
+</body>
+</html>
