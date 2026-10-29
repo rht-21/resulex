@@ -2,9 +2,30 @@
 name = "resulex"
 version = "0.1.0"
 description = "Resume text parser built on rules, reference data and a small spaCy model (no LLM)."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Rohit Mishra" }]
 requires-python = ">=3.12"
+keywords = ["resume", "parser", "nlp", "spacy", "information-extraction", "onet"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+    "Topic :: Text Processing :: Linguistic",
+]
+# The spaCy model is not on PyPI; users install it with: python -m spacy download en_core_web_sm
 dependencies = [
     "spacy>=3.8,<3.9",
+]
+
+[project.urls]
+Repository = "https://github.com/rht-21/resulex"
+
+[project.scripts]
+resulex = "resulex.cli:main"
+
+[dependency-groups]
+dev = [
     "en_core_web_sm",
     "openpyxl>=3.1",
 ]
