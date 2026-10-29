@@ -1,22 +1,18 @@
-"""python ui/server.py [--port 8000]: browser UI for the parser at http://127.0.0.1:8000"""
+"""python -m resulex.ui.server [--port 8000]: browser UI for the parser at http://127.0.0.1:8000"""
 
 import argparse
 import functools
 import json
 import logging
 import os
-import sys
 import time
 import tomllib
 from datetime import date
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 
-UI = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.dirname(UI))
+from .. import cli, match, parse
 
-import cli
-import match
-import parse
+UI = os.path.dirname(os.path.abspath(__file__))
 
 MAX_TEXT = 200_000
 log = logging.getLogger("resulex.ui")

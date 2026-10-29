@@ -3,8 +3,8 @@
 import re
 from collections import defaultdict
 
-import match
-from match import SKILL_ORDER
+from . import match
+from .match import SKILL_ORDER
 
 # \uf0xx: Word/PDF symbol-font bullets that come through as private-use characters.
 BULLET = re.compile(r"^\s*(?:[•●▪◦‣∙·■□○◆❖➢►→✓✔*-]|[-–—o](?=\s)|\d{1,2}[.)](?=\s))\s*")

@@ -7,7 +7,7 @@ import pickle
 import re
 from collections import defaultdict
 
-from match import SKILL_TYPES, case_key, config_hash, norm, norm_tok, tokens, vocab_stamp
+from .match import SKILL_TYPES, case_key, config_hash, norm, norm_tok, tokens, vocab_stamp
 
 MAX_WORDS = 12
 

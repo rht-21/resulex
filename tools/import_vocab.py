@@ -15,9 +15,9 @@ import sys
 import tomllib
 from collections import defaultdict
 
+from resulex.match import norm  # same normalization the parser uses for default ids
+
 HERE = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.dirname(HERE))
-from match import norm  # noqa: E402  (same normalization the parser uses for default ids)
 
 csv.field_size_limit(sys.maxsize)
 NULLS = {"", "n/a", "na", "null", "none"}
@@ -249,7 +249,7 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--raw", required=True, help="folder with the raw reference data")
     ap.add_argument("--mapping", default=os.path.join(HERE, "import.toml"))
-    ap.add_argument("--out", default=os.path.join(os.path.dirname(HERE), "vocab", "imported"))
+    ap.add_argument("--out", default=os.path.join(os.path.dirname(HERE), "src", "resulex", "vocab", "imported"))
     args = ap.parse_args()
     with open(args.mapping, "rb") as f:
         cfg = tomllib.load(f)

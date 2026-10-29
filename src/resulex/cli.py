@@ -33,8 +33,7 @@ EVAL_FIELDS = {
 def load_parser():
     import tomllib
 
-    import match
-    import parse
+    from . import match, parse
 
     with open(CONFIG, "rb") as f:
         raw = f.read()
@@ -100,7 +99,7 @@ def main():
         )
     args = p.parse_args()
     if args.cmd == "build":
-        import build
+        from . import build
 
         build.build(CONFIG)
     elif args.cmd == "parse":
