@@ -9,34 +9,54 @@ The name is resume + lexicon: every value is found by matching text against a vo
 credentials and skills. That matching works on any text, such as a job description; the structural fields
 (name, experience, education) expect a resume.
 
-## Setup
+## Install
 
-Requires Python 3.12+ and [uv](https://docs.astral.sh/uv/).
+Requires Python 3.12+.
 
 ```sh
-uv sync                        # installs spaCy, en_core_web_sm and openpyxl
-uv run python cli.py build     # compiles vocab/ into index.pkl
+pip install resulex
+python -m spacy download en_core_web_sm   # the spaCy model is not on PyPI; install it once
 ```
 
-`index.pkl` is not committed. Rebuild it whenever `config.toml` or anything under `vocab/` changes; the
-parser refuses to run on an out-of-date index and tells you to rebuild.
+The package ships with a prebuilt index, so parsing works straight away.
 
 ## Usage
 
+### Python
+
+```python
+from datetime import date
+
+import resulex
+
+result = resulex.parse(text)                              # dict; see Output below
+result = resulex.parse(text, today=date(2026, 10, 30))
+
+parser = resulex.Parser()                                 # loads the index and spaCy once
+results = [parser.parse(t) for t in texts]
+```
+
+`resulex.parse` creates a shared `Parser` on its first call (about a second), after which each resume
+takes tens of milliseconds. A missing spaCy model raises `resulex.ModelNotInstalledError`, and an index
+that does not match `config.toml` and `vocab/` raises `resulex.IndexOutOfDateError`; both messages say
+what to run.
+
+### Command line
+
 ```sh
-uv run python cli.py parse resume.txt              # print JSON to stdout
-cat resume.txt | uv run python cli.py parse -      # read from stdin
-uv run python cli.py parse resume.txt --today 2026-10-30
+resulex parse resume.txt                  # print JSON to stdout
+cat resume.txt | resulex parse -          # read from stdin
+resulex parse resume.txt --today 2026-10-30
 ```
 
 `--today` is the date used for "Present" when computing job durations (default: today). Pass a fixed
-date to get reproducible output.
+date to get reproducible output. `python -m resulex` works the same as `resulex`.
 
 ### Browser UI
 
 ```sh
-uv run python ui/server.py              # http://127.0.0.1:8000
-uv run python ui/server.py --port 9000
+resulex serve                 # http://127.0.0.1:8000
+resulex serve --port 9000
 ```
 
 Paste text or drop a `.txt` file and press **Extract** (⌘/Ctrl + Enter). The page shows the extracted
@@ -71,7 +91,7 @@ The top-level fields are:
 ## Evaluating
 
 ```sh
-uv run python cli.py eval eval/ --today 2026-10-30
+uv run resulex eval eval/ --today 2026-10-30
 ```
 
 For every `NAME.txt` in the folder, `eval` compares the parse with the expected answers in `NAME.json`
@@ -87,7 +107,7 @@ No accuracy figures are published here: they depend on the labeled set in `eval/
 Run `eval` on your own set to get them.
 
 For each field, `eval` turns the expected and the parsed value into a set of strings and compares the
-sets. The strings are exact matches after this per-field normalization (from `EVAL_FIELDS` in `cli.py`):
+sets. The strings are exact matches after this per-field normalization (from `EVAL_FIELDS` in `src/resulex/cli.py`):
 
 | Field | Compared as |
 |---|---|
@@ -177,21 +197,35 @@ text, not whether it is correct:
    which section they came from, how specific the phrase is and whether it fits the occupation group
    (so "EMR" in a nurse's resume is not read as the EMT credential).
 
-The modules:
+The modules, in `src/resulex/`:
 
 | File | Role |
 |---|---|
-| `cli.py` | Command line: `build`, `parse`, `eval` |
+| `__init__.py` | Library API: `parse`, `Parser` and the error types |
+| `cli.py` | Command line: `build`, `parse`, `eval`, `serve` |
 | `parse.py` | Resume text → fields |
 | `match.py` | Tokenizer and normalization shared with the build, index lookup, confidence scoring |
 | `build.py` | Compiles `vocab/` into `index.pkl` |
 | `config.toml` | Section headers, scoring weights, stoplists, occupation groups |
-| `tools/import_vocab.py` | Generates `vocab/imported/` from raw reference data |
 | `ui/` | Browser UI: `server.py` serves the page and a `/api/parse` endpoint |
+
+`tools/import_vocab.py`, outside the package, generates `vocab/imported/` from raw reference data.
+
+## Development
+
+Requires [uv](https://docs.astral.sh/uv/).
+
+```sh
+uv sync               # installs the package in editable mode, plus en_core_web_sm and openpyxl
+uv run resulex build  # compiles src/resulex/vocab/ into src/resulex/index.pkl
+```
+
+`index.pkl` is not committed. Rebuild it whenever `config.toml` or anything under `vocab/` changes; the
+parser refuses to run on an out-of-date index and tells you to rebuild.
 
 ## Vocabulary
 
-The index is built from JSON files in `vocab/`, one per entity type:
+The index is built from JSON files in `src/resulex/vocab/`, one per entity type:
 
 - `vocab/curated/` — hand-maintained lists. **Edit these.** For a given type, curated entries load before
   imported ones, so a curated label wins for a shared id.
@@ -218,7 +252,7 @@ Each file looks like:
 `aliases` match case-insensitively; `cased` aliases (acronyms) must match exactly. `socs` links the entity
 to O*NET-SOC occupations with a weight. `removals.json` lists phrases to drop, per type.
 
-After editing, run `uv run python cli.py build`.
+After editing, run `uv run resulex build`.
 
 ### Regenerating imported vocabulary
 
@@ -237,7 +271,19 @@ dumps, XLSX crosswalks) to entity types; paths in it are relative to `--raw`.
 uvx ruff format .
 ```
 
+## Releasing
+
+The wheel includes `index.pkl`, so build the index before building the package:
+
+```sh
+uv run resulex build
+uv build              # dist/resulex-<version>-py3-none-any.whl and .tar.gz
+uv publish            # needs a PyPI token
+```
+
+Bump `version` in `pyproject.toml` for every release; PyPI never accepts the same version twice.
+
 ## License
 
-The code is under the [MIT License](LICENSE). The files in `vocab/imported/` are derived from third-party
+The code is under the [MIT License](LICENSE). The files in `src/resulex/vocab/imported/` are derived from third-party
 reference data (O*NET, ESCO, CareerOneStop, NUCC, GeoNames and others), which keeps its own terms of use.
