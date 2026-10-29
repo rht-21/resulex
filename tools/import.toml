@@ -1,4 +1,4 @@
-# Maps raw reference data (O*NET, ESCO/tabiya, CareerOneStop, NUCC, keywords.json, playbooks) into
+# Maps raw reference data (O*NET, ESCO/tabiya, CareerOneStop, NUCC, keywords.json) into
 # vocab/imported/*.json. Run: uv run python tools/import_vocab.py --raw ../data
 # Paths are relative to --raw.
 # Entity types: title, skill, tech, tool, cert, org, license, specialty, degree, language.
@@ -68,17 +68,6 @@ entity = "title"
 id = "O*NET-SOC Code"
 label = "Reported Job Title"
 soc = "O*NET-SOC Code"
-
-[[source]]
-name = "playbook_titles"
-format = "json"
-path = "playbooks/*.json"
-skip_if = ["alias_of"]
-entity = "title"
-id = "occupation.soc_code"
-label = "occupation.canonical_title"
-aliases = ["title_disambiguation.aliases[*]"]
-soc = "occupation.soc_code"
 
 [[source]]
 name = "esco_occupations"
@@ -151,15 +140,6 @@ path = "onet/Technology Skills.txt"
 entity = "tech"
 label = "Example"
 soc = "O*NET-SOC Code"
-
-[[source]]
-name = "playbook_technology"
-format = "json"
-path = "playbooks/*.json"
-skip_if = ["alias_of"]
-entity = "tech"
-label = "technology_signals[*].name"
-soc = "occupation.soc_code"
 
 [[source]]
 name = "onet_tools"
