@@ -1,6 +1,5 @@
-"""python -m resulex.ui.server [--port 8000]: browser UI for the parser at http://127.0.0.1:8000"""
+"""resulex serve [--port 8000]: browser UI for the parser at http://127.0.0.1:8000"""
 
-import argparse
 import functools
 import json
 import logging
@@ -80,25 +79,19 @@ def make_handler(run, cfg):
     return Handler
 
 
-def main():
-    p = argparse.ArgumentParser(description="ResuLex browser UI")
-    p.add_argument("--port", type=int, default=8000)
-    args = p.parse_args()
+def serve(port):
+    """Serve the UI at http://127.0.0.1:<port> until interrupted."""
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s: %(message)s")
     with open(cli.CONFIG, "rb") as f:
         cfg = tomllib.load(f)
     log.info("loading index and spaCy model...")
     handler = functools.partial(make_handler(cli.load_parser(), cfg), directory=UI)
     # Localhost only and single-threaded: resumes are personal data, and one shared spaCy pipeline.
-    server = HTTPServer(("127.0.0.1", args.port), handler)
-    log.info("open http://127.0.0.1:%d", args.port)
+    server = HTTPServer(("127.0.0.1", port), handler)
+    log.info("open http://127.0.0.1:%d", port)
     try:
         server.serve_forever()
     except KeyboardInterrupt:
         pass
     finally:
         server.server_close()
-
-
-if __name__ == "__main__":
-    main()

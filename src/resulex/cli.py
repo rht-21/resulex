@@ -1,4 +1,4 @@
-"""python cli.py build | parse FILE|- [--today YYYY-MM-DD] | eval DIR [--today YYYY-MM-DD]"""
+"""resulex build | parse FILE|- [--today YYYY-MM-DD] | eval DIR [--today YYYY-MM-DD] | serve [--port 8000]"""
 
 import argparse
 import glob
@@ -92,6 +92,8 @@ def main():
         sp.add_argument(
             "--today", type=date.fromisoformat, default=date.today(), help="date used for 'Present' (default: today)"
         )
+    ps = sub.add_parser("serve", help="open the browser UI on http://127.0.0.1:PORT (localhost only)")
+    ps.add_argument("--port", type=int, default=8000)
     args = p.parse_args()
     if args.cmd == "build":
         from . import build
@@ -99,8 +101,12 @@ def main():
         build.build(CONFIG)
     elif args.cmd == "parse":
         cmd_parse(args)
-    else:
+    elif args.cmd == "eval":
         cmd_eval(args)
+    else:
+        from .ui.server import serve
+
+        serve(args.port)
 
 
 if __name__ == "__main__":
