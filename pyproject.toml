@@ -1,6 +1,6 @@
 [project]
 name = "resulex"
-version = "0.1.0"
+version = "0.1.1"
 description = "Resume text parser built on rules, reference data and a small spaCy model (no LLM)."
 readme = "README.md"
 license = "MIT"
@@ -17,9 +17,6 @@ classifiers = [
 dependencies = [
     "spacy>=3.8,<3.9",
 ]
-
-[project.urls]
-Repository = "https://github.com/rht-21/resulex"
 
 [project.scripts]
 resulex = "resulex.cli:main"

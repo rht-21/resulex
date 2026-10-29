@@ -285,5 +285,5 @@ Bump `version` in `pyproject.toml` for every release; PyPI never accepts the sam
 
 ## License
 
-The code is under the [MIT License](LICENSE). The files in `src/resulex/vocab/imported/` are derived from third-party
+The code is under the [MIT License](https://opensource.org/license/mit). The files in `src/resulex/vocab/imported/` are derived from third-party
 reference data (O*NET, ESCO, CareerOneStop, NUCC, GeoNames and others), which keeps its own terms of use.
