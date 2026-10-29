@@ -4,7 +4,6 @@ import hashlib
 import os
 import pickle
 import re
-import sys
 
 TOKEN = re.compile(r"[A-Za-z0-9]+(?:[.+#][A-Za-z0-9]+)*[+#]*|&")
 # Phrases never match across these.
@@ -83,6 +82,10 @@ def norm(text):
     return " ".join(norm_tok(t) for t, _, _ in tokens(text))
 
 
+class IndexOutOfDateError(Exception):
+    """index.pkl was built from a different config.toml or vocab/."""
+
+
 def config_hash(config_text):
     return hashlib.sha1(config_text.encode()).hexdigest()
 
@@ -102,7 +105,7 @@ def load_index(path, config_text, vocab_dir):
     with open(path, "rb") as f:
         index = pickle.load(f)
     if index["config_hash"] != config_hash(config_text) or index.get("vocab_stamp") != vocab_stamp(vocab_dir):
-        sys.exit(f"{path} is out of date with config.toml or vocab/; run: python cli.py build")
+        raise IndexOutOfDateError(f"{path} is out of date with config.toml or vocab/; run: resulex build")
     return index
 
 

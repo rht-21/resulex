@@ -8,8 +8,7 @@ import sys
 import time
 from datetime import date
 
-HERE = os.path.dirname(os.path.abspath(__file__))
-CONFIG = os.path.join(HERE, "config.toml")
+from . import CONFIG
 
 # How eval turns each field into comparable strings.
 EVAL_FIELDS = {
@@ -31,16 +30,12 @@ EVAL_FIELDS = {
 
 
 def load_parser():
-    import tomllib
+    from . import IndexOutOfDateError, ModelNotInstalledError, Parser
 
-    from . import match, parse
-
-    with open(CONFIG, "rb") as f:
-        raw = f.read()
-    cfg = tomllib.loads(raw.decode())
-    index = match.load_index(os.path.join(HERE, cfg["index"]), raw.decode(), os.path.join(HERE, cfg["vocab"]["dir"]))
-    parse.nlp()  # load spaCy up front so parse timings are warm
-    return lambda text, today: parse.parse(text, index, cfg, today)
+    try:
+        return Parser().parse
+    except (IndexOutOfDateError, ModelNotInstalledError) as e:
+        sys.exit(str(e))
 
 
 def cmd_parse(args):

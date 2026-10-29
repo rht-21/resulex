@@ -10,7 +10,8 @@ import tomllib
 from datetime import date
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 
-from .. import cli, match, parse
+from .. import cli, match
+from ..parse import DATE_RANGE, MONTH_DATE, header
 
 UI = os.path.dirname(os.path.abspath(__file__))
 
@@ -27,7 +28,7 @@ def section_spans(text, cfg):
     for chunk in text.splitlines(keepends=True):
         line = (chunk.splitlines() or [""])[0]
         if line.strip():
-            name, _ = parse.header(line.strip(), vocab, words)
+            name, _ = header(line.strip(), vocab, words)
             if name:
                 out.append({"name": name, "start": pos, "header": [pos, pos + len(line)]})
         pos += len(chunk)
@@ -64,7 +65,7 @@ def make_handler(run, cfg):
                     "sections": section_spans(text, cfg),
                     "result": result,
                     "ms": round(ms, 1),
-                    "date_patterns": [parse.DATE_RANGE.pattern, parse.MONTH_DATE.pattern],
+                    "date_patterns": [DATE_RANGE.pattern, MONTH_DATE.pattern],
                 },
             )
 

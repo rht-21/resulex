@@ -145,11 +145,19 @@ LOCATION = re.compile(
 _nlp = None
 
 
+class ModelNotInstalledError(Exception):
+    """The spaCy model en_core_web_sm is not installed."""
+
+
 def nlp():
     global _nlp
     if _nlp is None:
         import spacy
 
+        if not spacy.util.is_package("en_core_web_sm"):
+            raise ModelNotInstalledError(
+                "spaCy model en_core_web_sm is not installed; run: python -m spacy download en_core_web_sm"
+            )
         _nlp = spacy.load("en_core_web_sm", disable=["ner", "lemmatizer"])
     return _nlp
 
