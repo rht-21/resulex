@@ -132,16 +132,18 @@ def _find_in(text, index, types, order):
             if not entry:
                 continue
             surface = case_key(t for t, _, _ in toks[i : i + n])
-            found = [e for e, cased in entry[1] if (cased is None or cased == surface) and ents[e][0] in types]
+            found = [(e, c) for e, c in entry[1] if (c is None or c == surface) and ents[e][0] in types]
             if found:
-                best = min({ents[e][0] for e in found}, key=order.index)
+                best = min({ents[e][0] for e, _ in found}, key=order.index)
+                chosen = [(e, c) for e, c in found if ents[e][0] == best]
                 hit = {
                     "text": text[toks[i][1] : toks[i + n - 1][2]],
-                    "ents": [e for e in found if ents[e][0] == best],
+                    "ents": [e for e, _ in chosen],
                     "type": best,
                     "spec": entry[0],
                     "words": n,
-                    "cased": all(c for _, c in entry[1]),
+                    # Only the chosen type's aliases: "PALS" is an acronym even though a skill shares its key.
+                    "cased": all(c for _, c in chosen),
                 }
                 break
         if hit:
@@ -227,7 +229,11 @@ def score(hit, base, section_w, index, soc_weights, cfg):
     # entries ("Advanced Cardiac Life Support" / "Advanced Cardiovascular Life Support (ACLS) ...") are one thing.
     if hit["cased"] and len(ranked) > 1 and coh == 0 and not same_thing([e for _, e in ranked], index):
         return None, 0.0
-    conf = base * hit["spec"] * section_w * (1 + cfg["coherence_boost"] * coh)
+    # An exact-case credential acronym ("BLS", "FNP-BC") identifies one thing; its short length is not vagueness.
+    spec = (
+        cfg["cased_credential_spec"] if hit["cased"] and index["ents"][ent][0] in ("license", "cert") else hit["spec"]
+    )
+    conf = base * spec * section_w * (1 + cfg["coherence_boost"] * coh)
     return ent, round(min(1.0, conf), 2)
 
 

@@ -47,9 +47,17 @@ ISSUER = re.compile(
 )
 STATUS = re.compile(
     r"\b(active|current|valid|inactive|expired|lapsed|pending|in progress|eligible|multistate|"
-    r"compact)\b",
+    r"compact|by endorsement|expected)\b",
     re.I,
 )
+# Unfilled template text on a credential line: "[License #]", "— Include if obtained".
+PLACEHOLDER = re.compile(
+    r"\s*\[[^\]]*\]|\s*[-–—]\s*(?:include )?if (?:obtained|applicable|completed|available)\b.*", re.I
+)
+# "Skills: Word, Excel": a label at the start of a line.
+LABEL = re.compile(r"^[A-Z][\w &/+-]{1,30}:\s*")
+# "P R O F E S S I O N A L   E X P E R I E N C E": a letter-spaced heading.
+SPACED = re.compile(r"(?:[A-Z&]\s+)+[A-Z&]")
 CLAIMED_YEARS = re.compile(r"\b(\d{1,2})\+?\s*(?:years|yrs)\b", re.I)
 HANDLED_SECTIONS = {
     "top",
@@ -170,11 +178,11 @@ def split_sections(text, cfg):
     words = {w for p in vocab for w in p.split()}
     sections = [("top", [])]
     for raw in text.splitlines():
-        line = raw.strip()
+        line = unspace(raw.strip())
         if not line:
             sections[-1][1].append("")  # kept so experience bullets can end at a blank line
             continue
-        name, rest = header(line, vocab, words)
+        name, rest = header(line, vocab, words, sections[-1][0])
         if name:
             sections.append((name, []))
             if rest:
@@ -184,11 +192,21 @@ def split_sections(text, cfg):
     return sections
 
 
-def header(line, vocab, words):
+def unspace(line):
+    """'P R O F E S S I O N A L   E X P E R I E N C E' -> 'PROFESSIONAL EXPERIENCE'; two or more spaces split words."""
+    if not SPACED.fullmatch(line):
+        return line
+    return " ".join(re.sub(r"\s", "", w) for w in re.split(r"\s{2,}", line))
+
+
+def header(line, vocab, words, current):
     """(section name, text after the header on the same line) when the line is a section header."""
     m = re.match(r"([A-Za-z][A-Za-z &/]{1,40}):\s*(.*)", line)
     if m and match.norm(m.group(1)) in vocab:
-        return vocab[match.norm(m.group(1))], m.group(2).strip()
+        name = vocab[match.norm(m.group(1))]
+        if name == current and m.group(2):
+            return None, None  # "Tools: Excel" inside a skills section labels a list, it does not start a section
+        return name, m.group(2).strip()
     # "Work Experience From 04/2025 to 06/2026": a two-word header followed by content.
     m = re.match(r"([A-Z][a-z]+ [A-Z][a-z]+)\s+(\S.*)", line)
     if m and match.norm(m.group(1)) in vocab:
@@ -202,7 +220,9 @@ def header(line, vocab, words):
         return vocab[key], ""
     toks = key.split()
     if 0 < len(toks) <= 5 and all(t in words or t == "and" for t in toks):
-        for t in toks:
+        # The head noun names the section: "Leadership Experience" is experience, "Summary of Experience" a summary.
+        head = toks[toks.index("of") - 1] if "of" in toks[1:] else toks[-1]
+        for t in [head] + toks:
             if t in vocab:
                 return vocab[t], ""
     # "NURSING EXPERIENCE", "LICENSES/NATIONAL CERTIFICATIONS": an all-caps line ending in a section word.
@@ -215,7 +235,7 @@ def paragraphs(lines):
     """Join wrapped lines; a bullet, a 'Label:' line or a line after a full stop starts a new one."""
     out = []
     for line in lines:
-        if not out or BULLET.match(line) or re.match(r"[A-Z][\w &/+-]{1,30}:\s", line) or out[-1].endswith((".", ":")):
+        if not out or BULLET.match(line) or LABEL.match(line) or out[-1].endswith((".", ":")):
             out.append(BULLET.sub("", line))
         elif re.search(r"\w-$", out[-1]):
             out[-1] += line  # a word hyphenated across lines: "self-" / "direction"
@@ -432,13 +452,18 @@ def contact_block(top, text, index):
             if len(first) % 2 == 0 and first[:half] == first[half:]:
                 first = first[:half]
             name, creds = split_credentials(first, index)
+            # A title after the name on the same line: "Jordan Ellis controls engineer".
+            lead, tail = NAME.match(name), ""
+            if not name_like(name, index) and lead and lead.end() < len(name):
+                name, tail = lead.group(), name[lead.end() :].strip()
             if name_like(name, index):
                 out["name"] = name
                 out["credentials"] = creds + [r for r in rest if re.fullmatch(r"[A-Z][A-Za-z-]{1,8}", r)]
-                parts = parts[1:]
+                parts = ([tail] if tail else []) + parts[1:]
         out["headline"].extend(p for p in parts if not is_prose(p))
     if out["name"] is None:
         out["name"] = name_from_email(text, out["emails"], index)
+        out["headline"] = [h for h in out["headline"] if h != out["name"]]
     return out
 
 
@@ -471,7 +496,13 @@ def split_credentials(s, index):
         known = entry and any(
             c == surface and index["ents"][e][0] in ("degree", "license", "cert") for e, c in entry[1]
         )
-        if not (known or re.fullmatch(r"[A-Z]{2,5}(?:-[A-Z]{1,4})+", w)):
+        # An acronym not in the data ("MSPAS") after a mixed-case name; not the last word of "MARY ANN SMITH".
+        unknown = (
+            re.fullmatch(r"[A-Z]{2,6}(?:-[A-Z]{1,4})*", w)
+            and ("-" in w or not words[-2].isupper())
+            and not re.fullmatch(r"[IVX]+|JR|SR", w)
+        )
+        if not (known or unknown):
             break
         creds.insert(0, words.pop())
     return " ".join(words), creds
@@ -482,7 +513,13 @@ def name_from_email(text, emails, index):
     locals_ = [re.sub(r"[^a-z]", "", e.split("@")[0].lower()) for e in emails]
     for line in text.splitlines()[:60]:
         line = line.strip()
-        if name_like(line, index) and any(all(w.lower().strip(".") in loc for w in line.split()) for loc in locals_):
+        # The email vouches for a lowercase name ("jordan ellis"), which name_like alone would not accept.
+        lower = re.fullmatch(r"[a-z]+(?: [a-z]+){1,3}", line) and not any(
+            h["words"] > 1 for h in match.find(line, index, {"title", "license"})
+        )
+        if (name_like(line, index) or lower) and any(
+            all(w.lower().strip(".") in loc for w in line.split()) for loc in locals_
+        ):
             return line
     return None
 
@@ -503,10 +540,11 @@ def phones(sections):
 
 def segments(text, split_commas):
     commas = r"|,\s+(?![^()]*\))" if split_commas else ""
-    parts = re.split(r"\s*\|\s*|\s+[–—]\s+|\s+@\s+|\s+at\s+(?=[A-Z])" + commas, text)
+    # Tabs are column gaps in PDF exports: "Title\tCompany\tDates".
+    parts = re.split(r"\s*\|\s*|\s+[–—]\s+|\s+@\s+|\s+at\s+(?=[A-Z])|\t+" + commas, text)
     out = []
     for p in parts:
-        p = p.strip(" ,-–—|")
+        p = p.strip(" \t,-–—|")
         if re.fullmatch(r"(?:Inc|LLC|Ltd|Corp|Co)\.?", p) and out:
             out[-1] += ", " + p
         elif p and re.search(r"[A-Za-z]", p):
@@ -562,7 +600,7 @@ def parse_job(entry, index, today):
     title = segs[title_i] if title_i is not None else None
     if title_i is not None and company_i is not None and line_of[company_i] != line_of[title_i]:
         # The title line is all title: "Insurance Broker – Lead Qualification & Client Acquisition".
-        title = head_lines[line_of[title_i]].strip(" ,-–—|")
+        title = head_lines[line_of[title_i]].strip(" \t,-–—|")
     return {
         "title": title,
         "company": company,
@@ -633,6 +671,12 @@ def looks_like_credential(item):
         return False
     if len(item.split()) > 15 or re.fullmatch(rf"[\W\d]*(?:{MONTH}\.?\s*)?[\W\d]*", item, re.I):
         return False
+    if "•" in item or PAGE_HEADER.search(item) and len(item.split()) <= 6:
+        return False  # a list of items joined onto one line; "JORDAN ELLIS | RESUME | 2"
+    if re.match(r"(?:no|not)\s|(?:relevant\s+)?course(?:s|work)\b", item, re.I):
+        return False  # "No OASIS certification", "Relevant coursework: ..."
+    if re.search(r"reliable (?:vehicle|transportation)", item, re.I):
+        return False  # a job requirement copied into the resume, not a credential held
     if re.search(r"continuing (?:medical |nursing )?education|\b(?:CME|CEU|CNE)s?\b.*credit", item, re.I):
         return False  # continuing-education hours are not a credential
     return not re.match(r"\d+(?:\.\d+)?\s+(?:clinical\s+)?hours\b", item, re.I)  # "250 hours of primary care"
@@ -674,7 +718,8 @@ def parse_credential(item, index, cfg, soc_weights):
     if not looks_like_credential(item):
         return None
     years = re.findall(YEAR, item)
-    item = re.sub(rf"\s*\((?:[^)]*\s)?{YEAR}\)", "", item)
+    statuses = [s.lower() for s in STATUS.findall(item)]  # before the placeholders go: "[in progress]"
+    item = PLACEHOLDER.sub("", re.sub(rf"\s*\((?:[^)]*\s)?{YEAR}\)", "", item)).strip(" -–—:")
     parts = split_outside_parens(item, ",")
     if not parts:
         return None
@@ -686,7 +731,6 @@ def parse_credential(item, index, cfg, soc_weights):
     if not issuer and org_hits:
         issuer = org_hits[0]["text"]
     state = STATE_NAME.search(item)
-    statuses = [s.lower() for s in STATUS.findall(item)]
     # "Adult Gerontology NP Certified (AANP)" is a board certification even though "NP" names a license.
     # Not plain "board": a license's issuer is usually a State Board of Nursing.
     board_cert = re.search(r"certif|board[- ]certified|\b(?:ANCC|AANP|NCCPA|AACN)\b|-(?:BC|C)\b", item, re.I)
@@ -719,6 +763,11 @@ def parse_credential(item, index, cfg, soc_weights):
         return None
     if out["id"] is None and ISSUER.search(name) and not acro:
         return None
+    # Unlinked, and shaped like a heading ("KEY STRENGTHS") or a sentence listing several things.
+    if out["id"] is None and (
+        name.isupper() and len(name.split()) > 1 and not CREDENTIAL_WORD.search(name) or len(rest) >= 3
+    ):
+        return None
     return out
 
 
@@ -745,15 +794,17 @@ def skill_items(lines):
     counts = {d: sum(l.count(d) for l in text_lines) for d in ";,|•∙·●▪\t"}
     delim = max(counts, key=counts.get)
     if counts[delim] == 0:
-        return [l for l in text_lines]
+        return [LABEL.sub("", l) for l in text_lines]
     items = []
+    # "(Word, Excel)" lists items; "(29 CFR 1910/1926)" does not.
+    inner_sep = re.compile(r"[,;]|(?<!\d)/|/(?!\d)")
     for line in text_lines:
-        line = re.sub(r"^[A-Z][\w &/+-]{1,30}:\s*", "", line)
+        line = LABEL.sub("", line)
         for item in split_outside_parens(line, delim):
             m = re.match(r"(.*?)\s*\((.+)\)\s*$", item)
-            if m and re.search(r"[,;/]", m.group(2)):
+            if m and inner_sep.search(m.group(2)):
                 items.append(m.group(1))
-                items.extend(p.strip() for p in re.split(r"[,;/]", m.group(2)) if p.strip())
+                items.extend(p.strip() for p in inner_sep.split(m.group(2)) if p.strip())
             else:
                 items.append(item)
     return items
@@ -888,6 +939,8 @@ class Skills:
         stopped = key in self.stop and method != "list_item"
         if not key or stopped or self.has_type(key, {"language"}) or text in STATES or text in STATES.values():
             return
+        if not re.search(r"[a-z]", key):
+            return  # "1926" (from "29 CFR 1910/1926"): a number is not a skill
         if hit and hit["type"] == "specialty" and self.has_type(key, {"title", "license"}):
             return  # "Registered Nurse" is a role, not a practice area skill
         item = {
@@ -907,17 +960,15 @@ class Skills:
                 hit["words"] == 1 and section != "skills" and match.coherence(ent, self.index, self.soc_weights) == 0
             ):
                 ent = None
-            # An item someone listed ("Word, Excel, PowerPoint") is a skill even when its data link is doubtful.
-            if ent is None and method not in ("list_item", "inline_list"):
-                return
+        # Running text yields fragments ("mechanical", "process hazards"); without a data link only an item someone
+        # listed in a skills section ("Word, Excel, PowerPoint") counts.
+        if ent is None and method != "list_item":
+            return
         if ent is not None:
             item.update(match.describe(ent, self.index), type=self.index["ents"][ent][0], confidence=conf)
             key = ("ent", ent)
         else:
             spec = cfg["unlinked_spec"][min(len(key.split()), len(cfg["unlinked_spec"])) - 1]
-            # A phrase from running text whose last word rarely ends a known skill ("institutional policies").
-            if section != "skills" and self.index["skill_heads"].get(key.split()[-1], 0) < cfg["head_support_min"]:
-                spec *= cfg["unsupported_head_factor"]
             item["confidence"] = round(base * spec * section_w, 2)
         old = self.items.get(key)
         if old is None or item["confidence"] > old["confidence"]:
@@ -1096,6 +1147,8 @@ def mentioned_credentials(text, sections, creds, index, cfg, soc_weights, pairs)
         for line in lines:
             hits = match.find(line, index, {"license", "cert"})
             acronyms = sum(h["cased"] and len(h["text"]) >= 3 for h in hits)
+            # The top block lists credentials ("License #: RN-... | ACLS, BLS, PALS"); a whole part is a list item.
+            listed = {match.norm(p) for p in re.split(r"[|,;]", line)} if name == "top" else set()
             for h in hits:
                 # Running text names many certification topics ("general surgery", "family medicine"); only an
                 # acronym ("ACLS") or a name that itself says credential ("Basic Life Support") counts.
@@ -1105,8 +1158,9 @@ def mentioned_credentials(text, sections, creds, index, cfg, soc_weights, pairs)
                     continue  # "CRM-style tracking": a modifier; "EMR": usually the record system, not a credential
                 if h["cased"] and h["text"] in pairs and not CREDENTIAL_WORD.search(pairs[h["text"]]):
                     continue  # the resume defines it as something else: "Chronic Care Management (CCM)"
+                base = cfg["base"]["list_item" if match.norm(h["text"]) in listed else "phrase"]
                 ent, conf = match.score(
-                    h, cfg["base"]["phrase"], cfg["section"].get(name, cfg["section"]["other"]), index, soc_weights, cfg
+                    h, base, cfg["section"].get(name, cfg["section"]["other"]), index, soc_weights, cfg
                 )
                 if ent is None or conf < cfg["min_confidence"]:
                     continue

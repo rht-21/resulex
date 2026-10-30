@@ -29,10 +29,10 @@ from datetime import date
 
 import resulex
 
-result = resulex.parse(text)                              # dict; see Output below
+result = resulex.parse(text)  # dict; see Output below
 result = resulex.parse(text, today=date(2026, 10, 30))
 
-parser = resulex.Parser()                                 # loads the index and spaCy once
+parser = resulex.Parser()  # loads the index and spaCy once
 results = [parser.parse(t) for t in texts]
 ```
 
@@ -148,7 +148,7 @@ confidence = min(1, base × specificity × section × (1 + coherence_boost × co
 | Term | Meaning | Values (`config.toml`) |
 |---|---|---|
 | `base` | How the phrase was found (`[match.base]`) | inline list item 0.95, skills-list item 0.9, phrase in running text 0.8, object of a bullet's verb 0.8 |
-| `specificity` | How telling the phrase is, computed at build time | see below |
+| `specificity` | How telling the phrase is, computed at build time; 1.0 (`cased_credential_spec`) for a license or certification matched by its exact-case acronym, since "BLS" is not vague for being short | see below |
 | `section` | Where it was found (`[match.section]`) | skills, certifications 1.0; summary, experience 0.85; top 0.8; education, other 0.6 |
 | `coherence` | How strongly the entity is linked to the resume's likely occupations: the highest (occupation weight × O*NET link weight) over those occupations | 0–1 |
 | `coherence_boost` | Weight of that link | 0.3 |
@@ -164,10 +164,9 @@ specificity = min(1, 0.35 + 0.25 × (words − 1) + 0.45 × rarity)
 itself or as a run of up to four words). A one-word phrase that appears nowhere else gets 0.35 + 0.45 = 0.8;
 any two-word phrase that appears nowhere else reaches the cap of 1.
 
-A skill that matches no vocabulary entity can still be kept if it was listed (a skills-list item or an
-inline list). It scores `base × unlinked_spec × section`, where `unlinked_spec` is 0.6, 0.8 or 0.9 for
-1, 2 or 3+ words. Outside the skills section, a phrase whose last word ends fewer than 5 known skills
-(`head_support_min`) is multiplied by a further 0.6 (`unsupported_head_factor`).
+A skill that matches no vocabulary entity is kept only when it is an item of a skills section. It scores
+`base × unlinked_spec × section`, where `unlinked_spec` is 0.6, 0.8 or 0.9 for 1, 2 or 3+ words. Phrases
+from running text (bullets, summary) count only when they link to a vocabulary entity.
 
 Example: "Outbound prospecting and lead generation" in a skills list matches no entity, so it scores
 0.9 (list item) × 0.9 (five words) × 1.0 (skills section) = **0.81**.

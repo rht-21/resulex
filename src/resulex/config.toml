@@ -103,6 +103,8 @@ coherence_boost = 0.3
 spec_a = 0.35
 spec_b = 0.25
 spec_c = 0.45
+# Specificity used instead for a license or certification matched by its exact-case acronym ("BLS", "PA-C")
+cased_credential_spec = 1.0
 stoplist = [
   "health", "testing", "training", "communication", "documentation", "management", "support",
   "care", "planning", "education", "research", "service", "services", "work", "team", "staff",
@@ -131,11 +133,8 @@ filler_adjectives = [
   "seamless", "dynamic", "ongoing", "routine", "overall", "proper", "optimal", "positive", "relevant", "specific",
   "high-acuity", "high-volume", "fast-paced", "hands-on",
 ]
-# Specificity of a skill not found in the data, by word count (1, 2, 3+)
+# Specificity of a skills-list item not found in the data, by word count (1, 2, 3+)
 unlinked_spec = [0.6, 0.8, 0.9]
-# A phrase from running text whose last word ends fewer than this many known skills counts less
-head_support_min = 5
-unsupported_head_factor = 0.6
 
 [match.base]          # how much a match counts, by how it was found
 list_item = 0.9       # an item in a skills list
@@ -157,7 +156,9 @@ summary = ["summary", "professional summary", "career summary", "profile", "prof
            "objective", "career objective", "about", "about me", "overview", "highlights"]
 experience = ["experience", "work experience", "professional experience", "employment", "employment history",
               "work history", "career history", "relevant experience", "clinical experience", "positions",
-              "work", "current", "past", "professional history", "career experience", "employment experience"]
+              "work", "current", "past", "professional history", "career experience", "employment experience",
+              "internship", "internships", "practicum", "clinical rotations", "leadership experience",
+              "military experience"]
 education = ["education", "academic background", "education and training", "academics"]
 skills = ["qualifications", "qualifications summary", "summary of qualifications", "key qualifications",
           "highlights of qualifications", "qualification highlights", "skills summary", "skill highlights",

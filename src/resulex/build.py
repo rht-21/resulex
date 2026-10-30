@@ -152,11 +152,6 @@ def build(config_path):
                     del b.phrases[norm(a)][ent]
 
     phrases = b.specificity()
-    # How many skill phrases end in each word: "assessment", "care", "testing" are typical skill heads.
-    skill_heads = defaultdict(int)
-    for key, (_, ents) in phrases.items():
-        if any(b.ents[e][0] in SKILL_TYPES | {"specialty"} for e, _ in ents):
-            skill_heads[key.split()[-1]] += 1
     max_len = {}
     for key in phrases:
         words = key.split()
@@ -170,7 +165,6 @@ def build(config_path):
         "attrs": b.attrs,
         "phrases": phrases,
         "max_len": max_len,
-        "skill_heads": dict(skill_heads),
         "rel": dict(b.rel),
         "ent_groups": ent_groups(b.rel),
         "soc_titles": {e[1]: e[2] for e in b.ents if e[0] == "title" and re.fullmatch(r"\d\d-\d{4}\.\d\d", e[1])},

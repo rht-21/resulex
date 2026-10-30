@@ -10,7 +10,7 @@ from datetime import date
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 
 from .. import cli, match
-from ..parse import DATE_RANGE, MONTH_DATE, header
+from ..parse import DATE_RANGE, MONTH_DATE, header, unspace
 
 UI = os.path.dirname(os.path.abspath(__file__))
 
@@ -27,7 +27,7 @@ def section_spans(text, cfg):
     for chunk in text.splitlines(keepends=True):
         line = (chunk.splitlines() or [""])[0]
         if line.strip():
-            name, _ = header(line.strip(), vocab, words)
+            name, _ = header(unspace(line.strip()), vocab, words, out[-1]["name"])
             if name:
                 out.append({"name": name, "start": pos, "header": [pos, pos + len(line)]})
         pos += len(chunk)
