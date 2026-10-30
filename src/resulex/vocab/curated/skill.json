@@ -1,0 +1,172 @@
+{
+  "type": "skill",
+  "entities": [
+    {
+      "id": "evidence-based practice",
+      "label": "evidence-based practice",
+      "source": "curated_skills",
+      "aliases": [
+        "evidence-based practice",
+        "evidence based practice",
+        "evidence-based care"
+      ],
+      "cased": [
+        "EBP"
+      ]
+    },
+    {
+      "id": "patient-centered care",
+      "label": "patient-centered care",
+      "source": "curated_skills",
+      "aliases": [
+        "patient-centered care",
+        "patient centered care",
+        "patient-centred care"
+      ]
+    },
+    {
+      "id": "family-centered care",
+      "label": "family-centered care",
+      "source": "curated_skills",
+      "aliases": [
+        "family-centered care",
+        "family centered care",
+        "family-centred care"
+      ]
+    },
+    {
+      "id": "patient education",
+      "label": "patient education",
+      "source": "curated_skills",
+      "aliases": [
+        "patient education",
+        "patient teaching",
+        "patient and family education"
+      ]
+    },
+    {
+      "id": "patient care",
+      "label": "patient care",
+      "source": "curated_skills",
+      "aliases": [
+        "patient care",
+        "direct patient care",
+        "bedside care"
+      ]
+    },
+    {
+      "id": "diagnostic testing",
+      "label": "diagnostic testing",
+      "source": "curated_skills",
+      "aliases": [
+        "diagnostic testing",
+        "diagnostic tests"
+      ]
+    },
+    {
+      "id": "clinical decision making",
+      "label": "clinical decision making",
+      "source": "curated_skills",
+      "aliases": [
+        "clinical decision making",
+        "clinical decision-making"
+      ]
+    },
+    {
+      "id": "clinical judgment",
+      "label": "clinical judgment",
+      "source": "curated_skills",
+      "aliases": [
+        "clinical judgment",
+        "clinical judgement"
+      ]
+    },
+    {
+      "id": "critical thinking",
+      "label": "critical thinking",
+      "source": "curated_skills",
+      "aliases": [
+        "critical thinking"
+      ]
+    },
+    {
+      "id": "accounts receivable",
+      "label": "accounts receivable",
+      "source": "curated_skills",
+      "aliases": [
+        "accounts receivable"
+      ]
+    },
+    {
+      "id": "accounts payable",
+      "label": "accounts payable",
+      "source": "curated_skills",
+      "aliases": [
+        "accounts payable"
+      ]
+    },
+    {
+      "id": "skill acquisition",
+      "label": "skill acquisition",
+      "source": "curated_skills",
+      "aliases": [
+        "skill acquisition",
+        "skill acquisition programs",
+        "skill-acquisition programming"
+      ]
+    },
+    {
+      "id": "staff training",
+      "label": "staff training",
+      "source": "curated_skills",
+      "aliases": [
+        "staff training",
+        "staff education",
+        "employee training"
+      ]
+    },
+    {
+      "id": "informed consent",
+      "label": "informed consent",
+      "source": "curated_skills",
+      "aliases": [
+        "informed consent"
+      ]
+    },
+    {
+      "id": "health assessment",
+      "label": "health assessment",
+      "source": "curated_skills",
+      "aliases": [
+        "health assessment",
+        "health assessments"
+      ]
+    },
+    {
+      "id": "interdisciplinary collaboration",
+      "label": "interdisciplinary collaboration",
+      "source": "curated_skills",
+      "aliases": [
+        "interdisciplinary collaboration",
+        "interprofessional collaboration",
+        "multidisciplinary collaboration"
+      ]
+    },
+    {
+      "id": "chemotherapy administration",
+      "label": "chemotherapy administration",
+      "source": "curated_skills",
+      "aliases": [
+        "chemotherapy administration"
+      ]
+    },
+    {
+      "id": "health coaching",
+      "label": "health coaching",
+      "source": "curated_skills",
+      "aliases": [
+        "health coaching"
+      ]
+    }
+  ]
+}

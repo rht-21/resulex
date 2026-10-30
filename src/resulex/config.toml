@@ -6,6 +6,11 @@
 
 index = "index.pkl"
 
+[limits]
+# Longer input raises InputTooLargeError; the longest real resume seen is ~17k characters, and a 550k-character
+# document took 9 s to parse.
+max_chars = 300000
+
 [vocab]
 dir = "vocab"
 # Load order; for each type the curated file loads before the imported one.

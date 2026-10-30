@@ -54,6 +54,13 @@ STATUS = re.compile(
 PLACEHOLDER = re.compile(
     r"\s*\[[^\]]*\]|\s*[-–—]\s*(?:include )?if (?:obtained|applicable|completed|available)\b.*", re.I
 )
+# "License #: RN-000000-WI", "License No. 12345", "Washington State License AP30004736": a credential number; a bare
+# four-digit number is a year, not a number.
+LICENSE_NUMBER = re.compile(
+    r"\s*(?:(?:#|\bNo\.|\bNumber\b|\bNum\.)\s*:?\s*(?P<n>[A-Z0-9][A-Z0-9-]{2,})"
+    r"|(?<![\w-])(?=[A-Z0-9-]*\d)(?P<n2>(?:[A-Z]{1,4}-?\d{4,}[A-Z0-9-]*|\d{5,}[A-Z0-9-]*|[A-Z]{1,4}-\d{3,}[A-Z0-9-]*))\b)"
+)
+EXPIRY = re.compile(r"[\s,(]*\b(?:exp(?:ires|iration|\.)?|valid (?:through|until|thru))\b[^)]*\)?\s*$", re.I)
 # "Skills: Word, Excel": a label at the start of a line.
 LABEL = re.compile(r"^[A-Z][\w &/+-]{1,30}:\s*")
 # "P R O F E S S I O N A L   E X P E R I E N C E": a letter-spaced heading.
@@ -66,6 +73,7 @@ HANDLED_SECTIONS = {
     "education",
     "certifications",
     "skills",
+    "certifications_skills",
     "languages",
     "availability",
     "location",
@@ -150,6 +158,14 @@ LOCATION = re.compile(
     + r"|[A-Z]{2})\b(?:,?\s+(\d{5})(?:-\d{4})?)?"
 )
 
+TRAILING_PLACE = re.compile(
+    r",\s*([A-Z][A-Za-z.'’-]*(?:\s+[A-Z][A-Za-z.'’-]*){0,2}),\s*("
+    + "|".join(STATES)
+    + r"|"
+    + "|".join(STATES.values())
+    + r")\s*$"
+)
+
 _nlp = None
 
 
@@ -220,6 +236,8 @@ def header(line, vocab, words, current):
         return vocab[key], ""
     toks = key.split()
     if 0 < len(toks) <= 5 and all(t in words or t == "and" for t in toks):
+        if {"certifications", "skills"} <= {vocab[t] for t in toks if t in vocab}:
+            return "certifications_skills", ""  # "CERTIFICATIONS & SKILLS": each item is one or the other
         # The head noun names the section: "Leadership Experience" is experience, "Summary of Experience" a summary.
         head = toks[toks.index("of") - 1] if "of" in toks[1:] else toks[-1]
         for t in [head] + toks:
@@ -228,6 +246,9 @@ def header(line, vocab, words, current):
     # "NURSING EXPERIENCE", "LICENSES/NATIONAL CERTIFICATIONS": an all-caps line ending in a section word.
     if 0 < len(toks) <= 5 and toks[-1] in vocab and line.upper() == line:
         return vocab[toks[-1]], ""
+    # "Advanced Practice & Nursing Experience": in title case only "Experience" (a title can end in "Education").
+    if 0 < len(toks) <= 5 and toks[-1] == "experience":
+        return "experience", ""
     return None, None
 
 
@@ -257,9 +278,14 @@ def line_items(lines):
 
 def title_like(line):
     words = re.findall(r"[A-Za-z][\w'-]*", line)
-    return 0 < len(words) <= 8 and sum(w[0].isupper() for w in words) >= 0.6 * len(words)
+    if 0 < len(words) <= 8 and sum(w[0].isupper() for w in words) >= 0.6 * len(words):
+        return True
+    # "Licensed Practical Nurse — Spa City Family Medicine Associates, Hot Springs, AR": a title and its employer.
+    parts = re.split(r"\s[–—|·]\s|\s-\s", line, maxsplit=1)
+    return len(parts) == 2 and len(words) <= 16 and not line.rstrip().endswith(".") and title_like(parts[0])
 
 
+GLUED_MONTH = re.compile(rf"(?<=[a-z])(?=(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?,?\s+{YEAR})")
 DANGLING_DATE = re.compile(rf"(?:{ONE_DATE}\s*(?:-|–|—|to)|(?:-|–|—|to)\s*{MONTH}\.?)\s*$", re.I)
 PAGE_HEADER = re.compile(r"\b(?:resume|résumé|curriculum vitae|page\s+\d+(?:\s+of\s+\d+)?)\b", re.I)
 
@@ -287,6 +313,43 @@ def tidy_experience(lines, name):
     return out
 
 
+DATE_FIRST = re.compile(rf"\s*{ONE_DATE}\s*(?:-|–|—|to)\s*(?:{ONE_DATE}|{PRESENT})\b", re.I)
+DATE_ONLY = re.compile(rf"\s*{ONE_DATE}\s*(?:-|–|—|to|until|through|thru)\s*(?:{ONE_DATE}|{PRESENT})\s*", re.I)
+
+
+def unzip_columns(lines):
+    """A two-column export lists every role first and every date range after it; put each range under its role.
+
+    'Hygienist / Green Dental / Hygienist / Highland Dental / Oct 2019 - Current / Aug 2016 - Apr 2022' becomes
+    'Hygienist | Green Dental | Oct 2019 - Current' / 'Hygienist | Highland Dental | Aug 2016 - Apr 2022': one dated
+    header line per role, which entry_blocks splits like any 'Title | Company | Dates' list.
+    """
+    out, i = [], 0
+    while i < len(lines):
+        if not (lines[i] and DATE_ONLY.fullmatch(lines[i])):
+            out.append(lines[i])
+            i += 1
+            continue
+        dates = []
+        while i < len(lines) and (not lines[i] or DATE_ONLY.fullmatch(lines[i])):
+            if lines[i]:
+                dates.append(lines[i])
+            i += 1
+        # The header lines right before the dates: undated, unbulleted, title-like.
+        k = len(out)
+        while k and (
+            not out[k - 1] or not BULLET.match(out[k - 1]) and not has_date(out[k - 1]) and title_like(out[k - 1])
+        ):
+            k -= 1
+        heads = [l for l in out[k:] if l]
+        group = len(heads) // len(dates) if len(dates) > 1 else 0
+        if group in (1, 2, 3) and group * len(dates) == len(heads):
+            out[k:] = [" | ".join(heads[n * group : (n + 1) * group] + [dates[n]]) for n in range(len(dates))] + [""]
+        else:
+            out += dates
+    return out
+
+
 def entry_blocks(lines):
     """Group experience lines into entries: header lines (title, company, dates) followed by bullets.
 
@@ -294,10 +357,24 @@ def entry_blocks(lines):
     """
     entries, after_blank = [], False
     lines = [l for i, l in enumerate(lines) if l or (i and lines[i - 1])]
+    # Entries that open with their dates ("2006-2007 Lawnwood Medical Center – Ft. Pierce, FL" / "Nurse Tech"): only a
+    # dated line starts the next entry, so a title line under the dates stays with them.
+    date_led = bool(DATE_FIRST.match(next((l for l in lines if l), "")))
     for i, line in enumerate(lines):
         cur = entries[-1] if entries else None
         if not line:
             after_blank = True
+            continue
+        # "Pain Management Nurse Practitioner" / "• Advanced Pain Management | 2023 – 2025": a bulleted employer line.
+        if (
+            BULLET.match(line)
+            and cur
+            and not cur["bullets"]
+            and not dated(cur)
+            and DATE_RANGE.search(line)
+            and len(line.split()) <= 12
+        ):
+            cur["head"].append(BULLET.sub("", line))
             continue
         if BULLET.match(line):
             if cur is None:
@@ -317,7 +394,11 @@ def entry_blocks(lines):
             entries.append({"head": [line], "bullets": []})
         elif cur and dated(cur) and not title_like(line):
             cur["bullets"].append(line)
-        elif cur is None or cur["bullets"] or (dated(cur) and (has_date(line) or next_is_dated(lines, i))):
+        elif (
+            cur is None
+            or cur["bullets"]
+            or (dated(cur) and (has_date(line) or not date_led and next_is_dated(lines, i)))
+        ):
             entries.append({"head": [line], "bullets": []})
         else:
             cur["head"].append(line)
@@ -420,6 +501,7 @@ def ym(d):
 def contact_block(top, text, index):
     out = {
         "name": None,
+        "display_name": None,
         "credentials": [],
         "headline": [],
         "email": None,
@@ -456,7 +538,8 @@ def contact_block(top, text, index):
             lead, tail = NAME.match(name), ""
             if not name_like(name, index) and lead and lead.end() < len(name):
                 name, tail = lead.group(), name[lead.end() :].strip()
-            if name_like(name, index):
+            # "Ccu Rn at Baptist Health" is a headline: a role at an employer, not a name.
+            if name_like(name, index) and not re.match(r"(?:at|@)\s", tail, re.I):
                 out["name"] = name
                 out["credentials"] = creds + [r for r in rest if re.fullmatch(r"[A-Z][A-Za-z-]{1,8}", r)]
                 parts = ([tail] if tail else []) + parts[1:]
@@ -464,10 +547,26 @@ def contact_block(top, text, index):
     if out["name"] is None:
         out["name"] = name_from_email(text, out["emails"], index)
         out["headline"] = [h for h in out["headline"] if h != out["name"]]
+    out["display_name"] = display_name(out["name"])
     return out
 
 
-NAME = re.compile(r"[A-Z][A-Za-z.'’-]*(?:\s+[A-Z][A-Za-z.'’-]*){1,4}")
+def display_name(name):
+    """'MARY D’ANGELO' -> 'Mary D’Angelo', 'sean mcdonald' -> 'Sean McDonald'; a mixed-case name is kept as written."""
+    if not name or not (name.isupper() or name.islower()):
+        return name
+
+    def word(w):
+        w = re.sub(r"[A-Za-z]+", lambda m: m.group().capitalize(), w.lower())  # also after ’ ' - .
+        return re.sub(r"^Mc([a-z])", lambda m: "Mc" + m.group(1).upper(), w)
+
+    return " ".join(word(w) for w in name.split())
+
+
+# Lowercase surname particles are part of a name: "Jordan van Ellis", "Maria de la Cruz".
+NAME = re.compile(
+    r"[A-Z][A-Za-z.'’-]*(?:\s+(?:(?:van|von|de|da|del|der|di|du|la|le|dos|das|bin|al)\s+){0,2}[A-Z][A-Za-z.'’-]*){1,4}"
+)
 
 
 def is_prose(line):
@@ -478,12 +577,49 @@ def is_prose(line):
     return sum(w[0].islower() for w in words) >= 0.4 * len(words)
 
 
+# Credential acronyms LinkedIn headlines write in title case ("Ccu Rn"); two-letter ones are kept to these, since
+# "Ma" and "Do" are surnames.
+TITLE_CASED_ACRONYMS = {"rn", "np"}
+
+
 def name_like(s, index):
-    """Two to five capitalized words that are not a job title, school or organization."""
+    """Two to five capitalized words that are not a job title, role headline, place, school or organization."""
     if not NAME.fullmatch(s or "") or SCHOOL_WORDS.search(s) or ORG.search(s):
         return False
-    # One-word titles are common first names (Mason, Hunter, Dean); only a multi-word title rules a line out.
-    return not any(h["words"] > 1 for h in match.find(s, index, {"title", "license"}))
+    hits = match.find(s, index, {"title", "license", "cert", "specialty"})
+    # One-word titles are common first names (Mason, Hunter, Dean); only a multi-word phrase rules a line out,
+    # or a title next to a practice area ("Hospice Nurse").
+    if any(h["words"] > 1 for h in hits):
+        return False
+    if any(h["type"] == "title" for h in hits) and any(h["type"] == "specialty" for h in hits):
+        return False
+    words = s.split()
+    if any(credential_acronym(w, index) for w in words):
+        return False  # "Consultant BCBA", "Orthopedic Surgery Pa-C", "Emergency Room Rn"
+    return not is_place(words, index)  # "Lewisville Texas"
+
+
+def credential_acronym(word, index):
+    """'BCBA', 'Pa-C', 'Rn': a license, certification or degree acronym, in any case."""
+    key = match.norm(word)
+    if key in TITLE_CASED_ACRONYMS:
+        return True
+    letters = re.sub(r"[^A-Za-z]", "", word)
+    entry = index["phrases"].get(key)
+    if len(letters) < 3 or not entry:
+        return False
+    upper = match.case_key(t for t, _, _ in match.tokens(word.upper()))
+    return any(c == upper and index["ents"][e][0] in ("license", "cert", "degree") for e, c in entry[1])
+
+
+def is_place(words, index):
+    """'Lewisville Texas', 'Austin TX': a city followed by its state."""
+    for n in (2, 1):
+        if len(words) > n:
+            state = STATES.get(" ".join(words[-n:]), " ".join(words[-n:]) if n == 1 else None)
+            if state and (" ".join(words[:-n]).lower(), state) in index["places"]:
+                return True
+    return False
 
 
 def split_credentials(s, index):
@@ -540,8 +676,11 @@ def phones(sections):
 
 def segments(text, split_commas):
     commas = r"|,\s+(?![^()]*\))" if split_commas else ""
-    # Tabs are column gaps in PDF exports: "Title\tCompany\tDates".
-    parts = re.split(r"\s*\|\s*|\s+[–—]\s+|\s+@\s+|\s+at\s+(?=[A-Z])|\t+" + commas, text)
+    # Tabs are column gaps in PDF exports: "Title\tCompany\tDates". A middle dot separates too.
+    parts = re.split(r"\s*\|\s*|\s+[–—·]\s+|\s+@\s+|\s+at\s+(?=[A-Z])|\t+" + commas, text)
+    # A spaced hyphen separates a title from its employer ("Technician - Bayou Recovery Center") but not an employer
+    # from its unit ("Saint Rose Hospital - San Martin Campus"); an unspaced one is part of a word ("Medical-Surgical").
+    parts = [q for p in parts for q in split_hyphen(p)]
     out = []
     for p in parts:
         p = p.strip(" \t,-–—|")
@@ -550,6 +689,17 @@ def segments(text, split_commas):
         elif p and re.search(r"[A-Za-z]", p):
             out.append(p)
     return out
+
+
+ORG_END = re.compile(ORG.pattern + r"\s*$")
+
+
+def split_hyphen(part):
+    """'Technician - Bayou Recovery Center' -> 2 parts; 'Night Nurse - LPN or RN' and 'Hospital - Campus' stay one."""
+    left, sep, right = part.partition(" - ")
+    if not sep or ORG_END.search(left.strip()) or not ORG.search(right):
+        return [part]
+    return [left, *split_hyphen(right)]
 
 
 def title_fit(seg, index):
@@ -562,10 +712,31 @@ def title_fit(seg, index):
     return covered + (0.5 if starts else 0.0), socs
 
 
+def occupation_of(title, index):
+    """The O*NET-SOC occupation a job title links to most strongly: {"code": "29-1141.00", "title": ...} or None."""
+    hits = match.find(title or "", index, {"title", "license"})
+    if not hits:
+        return None
+    best_soc, best_w = None, -1.0
+    for e in max(hits, key=lambda h: h["words"])["ents"]:
+        for soc in index["socs"].get(e, ()):
+            w = index["rel"][soc].get(e, 0.0)
+            if soc in index["soc_titles"] and w > best_w:
+                best_soc, best_w = soc, w
+    return {"code": best_soc, "title": index["soc_titles"][best_soc]} if best_soc else None
+
+
+def ends_in_title(seg, index):
+    hits = match.find(seg, index, {"title", "license"})
+    return bool(hits) and match.norm(seg).endswith(match.norm(hits[-1]["text"]))
+
+
 def parse_job(entry, index, today):
     # Lines joined by newlines so a date range wrapped onto the next line ("November 2020-\nFebruary 2026") matches.
     head = URL.sub("", PHONE.sub("", EMAIL.sub("", "\n".join(entry["head"]))))
     head = re.sub(r"\(\s*(?:remote|hybrid|on-?site)[^)]*\)", "", head, flags=re.I)
+    head = GLUED_MONTH.sub(" ", head)  # "Chicago, IllinoisJanuary 2026": PDF text lost the column gap
+    head = re.sub(r"\[[^\]]*\]", "", head)  # unfilled template text: "[Month Year] – Present"
     start = end = None
     m = DATE_RANGE.search(head)
     if m:
@@ -576,6 +747,7 @@ def parse_job(entry, index, today):
         start = end = parse_date(m.group(), False, today)
         present = False
         head = head[: m.start()] + head[m.end() :]
+    head = re.sub(r"\(\s*\)", "", head)  # "Technician - Bayou Recovery (2022-2026)" leaves "()"
     loc, span = find_location(head, index)
     if loc:
         head = head[: span[0]] + head[span[1] :]
@@ -590,13 +762,24 @@ def parse_job(entry, index, today):
     org = re.compile(ORG.pattern, re.I)
     rank = [f - (0.5 if org.search(s) else 0) + (0.2 if i == 0 else 0) for i, (s, (f, _)) in enumerate(zip(segs, fits))]
     title_i = max(range(len(segs)), key=lambda i: rank[i], default=None)
-    if title_i is not None and fits[title_i][0] < 0.4:
+    # A weak fit falls back to the first segment, unless the first has no fit and this one ends in its title word:
+    # "Hope Home Care — Pediatric Home Care LPN".
+    if title_i is not None and fits[title_i][0] < 0.4 and not (fits[0][0] == 0 and ends_in_title(segs[title_i], index)):
         title_i = 0
+        # "Northwind Global Solutions" / "SDE-II": the first line is only the employer, the title is on the next line.
+        if ORG.search(segs[0]) and fits[0][0] == 0 and line_of.count(0) == 1:
+            title_i = next((i for i in range(1, len(segs)) if line_of[i] != line_of[0] and not ORG.search(segs[i])), 0)
     rest = [i for i in range(len(segs)) if i != title_i]
-    # Company: an organization word, else the first segment on another line than the title, else what is left.
+    # Company: an organization word, on another line than the title first ("Clinical Instructor – Medical-Surgical
+    # Nursing" / "Chicago State University"), else the first segment on another line, else what is left.
     other_line = [i for i in rest if line_of[i] != line_of[title_i]] if title_i is not None else rest
-    company_i = next((i for i in rest if ORG.search(segs[i])), (other_line or rest or [None])[0])
+    company_i = next((i for i in other_line + rest if ORG.search(segs[i])), (other_line or rest or [None])[0])
     company = re.sub(r"\s*\([^)]*\)", "", segs[company_i]).strip(" ,") if company_i is not None else None
+    # "Spa City Family Medicine Associates, Hot Springs, AR": a "City, ST" tail the place data did not know.
+    tail = TRAILING_PLACE.search(company or "")
+    if tail and not loc:
+        loc = {"city": tail.group(1), "state": STATES.get(tail.group(2), tail.group(2)), "zip": None}
+        company = company[: tail.start()]
     title = segs[title_i] if title_i is not None else None
     if title_i is not None and company_i is not None and line_of[company_i] != line_of[title_i]:
         # The title line is all title: "Insurance Broker – Lead Qualification & Client Acquisition".
@@ -607,7 +790,9 @@ def parse_job(entry, index, today):
         "location": loc,
         "start": ym(start) if start else None,
         "end": ("present" if present else ym(end)) if end else None,
+        "current": bool(end) and present,
         "months": total_months([(start, end)]) if start else None,
+        "occupation": occupation_of(title, index),
         "socs": fits[title_i][1] if title_i is not None else [],
         "bullets": entry["bullets"],
         "_interval": (start, end) if start else None,
@@ -659,6 +844,19 @@ def education_fields(line, index):
     schools = [s.strip() for s in CAP_RUN.findall(line) if SCHOOL_WORDS.search(s)]
     if schools:
         e["school"] = re.sub(r"^(?:of|the|and|for|at|&)\s+|\s+(?:of|the|and|for|at|&)$", "", schools[0])
+    elif e["degree"]:
+        # "BSN, WNU, 2007": a school written as its acronym, the part that is not the degree, a state or a credential.
+        e["school"] = next(
+            (
+                p
+                for p in re.split(r"\s*[,|–—]\s*|\s+-\s+", line)
+                if re.fullmatch(r"[A-Z]{2,6}", p)
+                and p != e["degree"]
+                and p not in STATES.values()
+                and not credential_acronym(p, index)
+            ),
+            None,
+        )
     return e
 
 
@@ -673,8 +871,8 @@ def looks_like_credential(item):
         return False
     if "•" in item or PAGE_HEADER.search(item) and len(item.split()) <= 6:
         return False  # a list of items joined onto one line; "JORDAN ELLIS | RESUME | 2"
-    if re.match(r"(?:no|not)\s|(?:relevant\s+)?course(?:s|work)\b", item, re.I):
-        return False  # "No OASIS certification", "Relevant coursework: ..."
+    if re.match(r"(?:no|not)\s|(?:relevant\s+)?course(?:s|work)\b|(?:willing|able) to\s|must\s", item, re.I):
+        return False  # "No OASIS certification", "Relevant coursework: ...", "Willing to complete the agility test"
     if re.search(r"reliable (?:vehicle|transportation)", item, re.I):
         return False  # a job requirement copied into the resume, not a credential held
     if re.search(r"continuing (?:medical |nursing )?education|\b(?:CME|CEU|CNE)s?\b.*credit", item, re.I):
@@ -717,9 +915,13 @@ def credential_items(lines, index):
 def parse_credential(item, index, cfg, soc_weights):
     if not looks_like_credential(item):
         return None
-    years = re.findall(YEAR, item)
     statuses = [s.lower() for s in STATUS.findall(item)]  # before the placeholders go: "[in progress]"
+    number = LICENSE_NUMBER.search(item)
+    if number:
+        item = (item[: number.start()] + item[number.end() :]).strip()
+    years = re.findall(YEAR, item)
     item = PLACEHOLDER.sub("", re.sub(rf"\s*\((?:[^)]*\s)?{YEAR}\)", "", item)).strip(" -–—:")
+    item = EXPIRY.sub("", item).strip(" -–—:,")  # "... license #135624    expires 9/30/2027"
     parts = split_outside_parens(item, ",")
     if not parts:
         return None
@@ -743,6 +945,7 @@ def parse_credential(item, index, cfg, soc_weights):
         "state": STATES[state.group(1)] if state else None,
         "status": statuses or None,
         "year": int(years[-1]) if years else None,
+        "number": (number.group("n") or number.group("n2")) if number else None,
         "kind": kind,
         "id": None,
         "label": None,
@@ -767,6 +970,11 @@ def parse_credential(item, index, cfg, soc_weights):
     if out["id"] is None and (
         name.isupper() and len(name.split()) > 1 and not CREDENTIAL_WORD.search(name) or len(rest) >= 3
     ):
+        return None
+    # Unlinked, and a degree or school line: "Associate Degree in Nursing (ADN) | ... College". A bare "Certificate"
+    # is also a degree in the data, so only a longer or acronym degree counts ("Critical Care Certificate" stays).
+    degree = any(h["words"] > 1 or h["cased"] for h in match.find(item, index, {"degree"}))
+    if out["id"] is None and (degree or SCHOOL_WORDS.search(item)):
         return None
     return out
 
@@ -998,8 +1206,15 @@ class Skills:
 # ---------- the whole resume ----------
 
 
+class InputTooLargeError(ValueError):
+    """The text is longer than config.toml's [limits] max_chars; no resume is that long."""
+
+
 def parse(text, index, cfg, today):
     mcfg = cfg["match"]
+    limit = cfg["limits"]["max_chars"]
+    if len(text) > limit:
+        raise InputTooLargeError(f"text has {len(text):,} characters; the limit is {limit:,} ([limits] max_chars)")
     text = text.replace("\r", "")
     sections = split_sections(text, cfg)
     by_name, experience_lines = defaultdict(list), []
@@ -1026,7 +1241,7 @@ def parse(text, index, cfg, today):
     out["summary"] = summary or None
     out["claimed_years"] = int(m.group(1)) if m else None
 
-    blocks = entry_blocks(tidy_experience(experience_lines, out["name"]))
+    blocks = entry_blocks(unzip_columns(tidy_experience(experience_lines, out["name"])))
     jobs = [parse_job(e, index, today) for e in blocks]
     intervals = [j.pop("_interval") for j in jobs]
     out["experience"] = jobs
@@ -1040,7 +1255,10 @@ def parse(text, index, cfg, today):
         (edu_creds if is_cred else edu_lines).append(line)
     out["education"] = parse_education(edu_lines, index)
 
-    cred_items = credential_items(by_name["certifications"] + edu_creds, index)
+    mixed = skill_items(by_name["certifications_skills"])
+    mixed_creds = [i for i in mixed if match.find(i, index, {"license", "cert"}) and looks_like_credential(i)]
+    mixed_skills = [i for i in mixed if i not in mixed_creds]
+    cred_items = credential_items(by_name["certifications"] + edu_creds, index) + mixed_creds
     soc_weights = occupation_weights(jobs, out, cred_items, index)
     groups = match.group_weights(soc_weights)
     out["occupation_group"] = (
@@ -1063,7 +1281,11 @@ def parse(text, index, cfg, today):
                 seen.add(key)
                 creds.append(c)
     pairs = match.acronym_pairs(text)
-    creds += mentioned_credentials(text, sections, creds, index, mcfg, soc_weights, pairs)
+    # "CCRN certified" or "Iowa PA license #..." read as a title still states the credential.
+    job_titles = sorted(
+        {j["title"] for j in jobs if j["title"] and not MENTION_WORD.search(j["title"])}, key=len, reverse=True
+    )
+    creds += mentioned_credentials(text, sections, creds, index, mcfg, soc_weights, pairs, job_titles)
     out["licenses"] = [c for c in creds if c.pop("kind") == "license"]
     out["certifications"] = [c for c in creds if c not in out["licenses"]]
     out["acronyms"] = pairs
@@ -1073,7 +1295,7 @@ def parse(text, index, cfg, today):
 
     sk = Skills(index, mcfg, soc_weights)
     lang_keys = {match.norm(l["language"]) for l in langs}
-    for item in skill_items(by_name["skills"]) + skills:
+    for item in skill_items(by_name["skills"]) + mixed_skills + skills:
         if match.norm(item) in lang_keys:
             continue
         hits = match.find(item, index, set(SKILL_ORDER), SKILL_ORDER)
@@ -1100,13 +1322,37 @@ def parse(text, index, cfg, today):
         )
         sk.add(t, method, "experience", hit)
     out["skills"] = sk.result()
+    for job in jobs:
+        said = f" {match.norm(' '.join(job['bullets']))} "
+        job["skills"] = [s["text"] for s in out["skills"] if f" {match.norm(s['text'])} " in said]
 
     out["specialties"] = specialties(out, jobs, summary, index, mcfg, soc_weights)
     current_job = blocks[0]["head"] if blocks else []
     out["availability"] = availability(by_name["availability"] + [summary] + by_name["top"] + current_job, index)
     out["seniority"] = seniority(jobs, out["headline"], index)
     out["other_sections"] = {n: by_name[n] for n in by_name if n not in HANDLED_SECTIONS}
+    out["document"] = document_kind(out, sections)
     return public(out)
+
+
+def document_kind(out, sections):
+    """Whether the text reads as a resume: {"kind": "resume" | "profile_export" | "unknown", "signals": {...}}.
+
+    An invoice or a letter still yields a "name" from its first line; "unknown" tells the caller not to trust it.
+    """
+    signals = {
+        "contact": bool(out["emails"] or out["phones"]),
+        "sections": len({n for n, lines in sections if n != "top" and any(lines)}),
+        "dated_jobs": sum(bool(j["start"]) for j in out["experience"]),
+        "education": len(out["education"]),
+    }
+    if signals["dated_jobs"] or signals["sections"] >= 2 or signals["sections"] and signals["contact"]:
+        kind = "resume"
+    elif out["job_title"] or out["industry"]:
+        kind = "profile_export"
+    else:
+        kind = "unknown"
+    return {"kind": kind, "signals": signals}
 
 
 INTERNAL_FIELDS = ("id", "source", "method", "found_in", "socs")
@@ -1135,8 +1381,11 @@ def occupation_weights(jobs, top, cred_items, index):
     return {s: v / top_w for s, v in w.items()}
 
 
-def mentioned_credentials(text, sections, creds, index, cfg, soc_weights, pairs):
-    """Licenses and certifications named outside the credentials section (summary, post-nominals, bullets)."""
+def mentioned_credentials(text, sections, creds, index, cfg, soc_weights, pairs, job_titles):
+    """Licenses and certifications named outside the credentials section (summary, post-nominals, bullets).
+
+    A job title is skipped: "Pediatric Home Care LPN" is the role held, not a credential stated.
+    """
     have = {c["id"] for c in creds if c["id"]} | {c["acronym"] for c in creds if c["acronym"]}
     licensed = {license_key(c["label"] or c["name"]) for c in creds if c["kind"] == "license"}
     stop_acronyms = set(cfg["running_text_acronym_stoplist"])
@@ -1145,6 +1394,9 @@ def mentioned_credentials(text, sections, creds, index, cfg, soc_weights, pairs)
         if name in ("certifications", "education"):
             continue
         for line in lines:
+            if name == "experience":
+                for title in job_titles:
+                    line = line.replace(title, " ")
             hits = match.find(line, index, {"license", "cert"})
             acronyms = sum(h["cased"] and len(h["text"]) >= 3 for h in hits)
             # The top block lists credentials ("License #: RN-... | ACLS, BLS, PALS"); a whole part is a list item.
@@ -1188,6 +1440,7 @@ def mentioned_credentials(text, sections, creds, index, cfg, soc_weights, pairs)
                     "state": None,
                     "status": None,
                     "year": None,
+                    "number": None,
                     "kind": h["type"],
                     **d,
                     "confidence": conf,

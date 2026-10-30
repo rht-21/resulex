@@ -5,10 +5,10 @@ import tomllib
 from datetime import date
 
 from .match import IndexOutOfDateError, load_index
-from .parse import ModelNotInstalledError, nlp
+from .parse import InputTooLargeError, ModelNotInstalledError, nlp
 from .parse import parse as parse_resume
 
-__all__ = ["IndexOutOfDateError", "ModelNotInstalledError", "Parser", "parse"]
+__all__ = ["IndexOutOfDateError", "InputTooLargeError", "ModelNotInstalledError", "Parser", "parse"]
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 CONFIG = os.path.join(HERE, "config.toml")

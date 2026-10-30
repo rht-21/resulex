@@ -221,6 +221,11 @@ def score(hit, base, section_w, index, soc_weights, cfg):
     """Pick the best entity for a hit, among those of the profile's occupation group; (entity or None, confidence)."""
     groups = profile_groups(soc_weights, cfg["related_group_ratio"])
     ents = [e for e in hit["ents"] if not groups or in_groups(e, index, groups)]
+    # The data ties a skill to few occupations ("electronic health record" only to IT and clerical work), so a
+    # multi-word skill still links outside the profile's group when it is close to the entity's own label; loose
+    # aliases ("state regulations" -> "constitutional law") stay behind the group rule.
+    if not ents and not hit["cased"] and hit["words"] > 1 and len(hit["ents"]) == 1:
+        ents = [e for e in hit["ents"] if index["ents"][e][0] in SKILL_TYPES and near_label(hit["text"], e, index)]
     if not ents:
         return None, 0.0
     ranked = sorted(((coherence(e, index, soc_weights), e) for e in ents), reverse=True)
@@ -235,6 +240,12 @@ def score(hit, base, section_w, index, soc_weights, cfg):
     )
     conf = base * spec * section_w * (1 + cfg["coherence_boost"] * coh)
     return ent, round(min(1.0, conf), 2)
+
+
+def near_label(text, ent, index):
+    """The phrase shares at least 60% of its words with the entity's label."""
+    words, label = set(norm(text).split()), set(norm(index["ents"][ent][2]).split())
+    return len(words & label) / max(1, len(words)) >= 0.6
 
 
 def same_thing(ents, index):

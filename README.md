@@ -39,7 +39,8 @@ results = [parser.parse(t) for t in texts]
 `resulex.parse` creates a shared `Parser` on its first call (about a second), after which each resume
 takes tens of milliseconds. A missing spaCy model raises `resulex.ModelNotInstalledError`, and an index
 that does not match `config.toml` and `vocab/` raises `resulex.IndexOutOfDateError`; both messages say
-what to run.
+what to run. Text longer than `[limits] max_chars` in `config.toml` (300,000 characters) raises
+`resulex.InputTooLargeError`.
 
 ### Command line
 
@@ -70,21 +71,23 @@ The top-level fields are:
 | Field | What it holds |
 |---|---|
 | `name`, `credentials`, `headline` | Name, post-nominal credentials ("RN, BSN") and headline lines from the top block |
+| `display_name` | `name` in title case when it is written all caps or all lowercase ("MARY D’ANGELO" → "Mary D’Angelo") |
 | `email` / `emails`, `phone` / `phones`, `urls` | Contact details; `phones` items have `number` and `type` |
 | `location` | `{city, state, zip}` |
 | `job_title`, `industry` | From labeled profile exports ("Job Title: ...") |
 | `summary`, `claimed_years` | Summary paragraph and any "10+ years" claim in it |
-| `experience` | Jobs: `title`, `company`, `location`, `start`, `end`, `months`, `bullets` |
+| `experience` | Jobs: `title`, `company`, `location`, `start`, `end`, `current`, `months`, `occupation` (`{code, title}`, the title's O*NET-SOC occupation), `bullets`, `skills` (the skills found in its bullets) |
 | `total_experience_months` | Sum of job intervals, overlaps counted once |
 | `education` | `degree`, `level`, `field`, `school`, `location`, `year`, `gpa` |
 | `occupation_group`, `occupations` | Inferred O*NET-SOC major group and up to three likely occupations |
-| `licenses`, `certifications` | `name`, `acronym`, `issuer`, `state`, `status`, `year`, `kind`, `label`, `confidence` |
+| `licenses`, `certifications` | `name`, `acronym`, `issuer`, `state`, `status`, `year`, `number` (license #), `label`, `confidence`; a credential that only appears as a job title ("Pediatric Home Care LPN") is not listed |
 | `acronyms` | Acronym ↔ long form pairs found in the text |
 | `languages` | `language` and `proficiency` |
 | `skills`, `specialties` | `text`, `type`, `label`, `confidence`, highest confidence first |
 | `availability` | `work_mode`, `shifts`, `employment_type` lists |
 | `seniority` | Level of the latest job title or headline: intern, entry level, senior, lead, manager, director, ... |
 | `other_sections` | Lines of sections the parser recognizes but does not interpret (projects, awards, ...) |
+| `document` | `kind`: `resume`, `profile_export` or `unknown` (an invoice or a letter still yields a `name`; do not trust it), and the `signals` behind it |
 
 `label` is the canonical name from the vocabulary when a match was found; `confidence` is 0–1.
 
@@ -172,7 +175,9 @@ Example: "Outbound prospecting and lead generation" in a skills list matches no 
 0.9 (list item) × 0.9 (five words) × 1.0 (skills section) = **0.81**.
 
 Results below `min_confidence` (0.45) are dropped. An entity tied only to other occupation groups than the
-resume's is not linked at all; one tied to no occupation (such as CPR) always can be. An acronym that names several unrelated entities with no occupation link is also not
+resume's is not linked at all; one tied to no occupation (such as CPR) always can be, and so can a multi-word
+skill that is the only entity for its phrase and shares most words with its label ("electronic medical record"
+in a nurse's resume, though the data ties it only to IT and clerical work). An acronym that names several unrelated entities with no occupation link is also not
 linked: "EMR" in a nurse's resume is not read as the EMT credential.
 
 ### What the browser UI's numbers mean

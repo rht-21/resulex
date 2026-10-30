@@ -1,0 +1,27 @@
+{
+  "type": "tech",
+  "entities": [
+    {
+      "id": "google workspace",
+      "label": "Google Workspace",
+      "source": "curated_skills",
+      "aliases": [
+        "Google Workspace",
+        "G Suite"
+      ]
+    },
+    {
+      "id": "microsoft 365",
+      "label": "Microsoft 365",
+      "source": "curated_skills",
+      "aliases": [
+        "Microsoft 365",
+        "Office 365"
+      ],
+      "cased": [
+        "MS 365",
+        "O365"
+      ]
+    }
+  ]
+}
